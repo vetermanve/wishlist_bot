@@ -1,0 +1,30 @@
+{
+    "name": "verse/boxer_bot",
+    "description": "Bot for remebering box content",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Denisov Mikhail",
+            "email": "manwebdev@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "" : "src/"    
+        }
+    },
+    "require": {
+        "verse/run": "^0.0.9",
+        "verse/storage": "^0.0.10",
+        "verse/modular": "^1.0",
+        "verse/router": "^1.1.1",
+        "verse/telegram" : "^0.1",
+        "ext-json": "*",
+        "vlucas/phpdotenv": "^5.3",
+        "vetermanve/background_multiprocessor": "^0.9",
+        "irazasyed/telegram-bot-sdk": "^3.4",
+        "phpunit/phpunit": "^9.5"
+    },
+    "minimum-stability" : "stable"
+}

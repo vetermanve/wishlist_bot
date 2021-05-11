@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+
+  workers:
+    build:
+      context: .docker/php-worker
+      args:
+        PUID: "1000"
+        PHP_INSTALL_XDEBUG: "true"
+        INSTALL_GIT: "true"
+        PHP_XDEBUG_PORT: "9000"
+    volumes:
+      - ./:/var/www
+    environment:
+      - "PHP_IDE_CONFIG=serverName=localhost"

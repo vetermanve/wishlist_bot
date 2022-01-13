@@ -2,6 +2,4 @@
 
 exec 2>&1
 
-sleep 1;
-exit 0;
 exec php /var/www/entrypoint/update_provider.php

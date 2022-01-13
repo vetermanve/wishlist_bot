@@ -9,7 +9,7 @@ class Start extends TelegramRunController {
 
     public function text_message(): ?TelegramResponse
     {
-        return $this->textResponse('Привет! Этот бот поможет тебе записать в каких коробках что лежит!');
+        return $this->textResponse("Привет! \nЗдесь ты можешь погадать на эмоджи. \nНапиши вопрос!");
     }
 
 }

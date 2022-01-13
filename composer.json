@@ -1,6 +1,6 @@
 {
-    "name": "verse/boxer_bot",
-    "description": "Bot for remebering box content",
+    "name": "verse/emoji_roll",
+    "description": "Bot emoji fortune-telling",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -24,7 +24,8 @@
         "vlucas/phpdotenv": "^5.3",
         "vetermanve/background_multiprocessor": "^0.9",
         "irazasyed/telegram-bot-sdk": "^3.4",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "spatie/emoji": "^3.0"
     },
     "minimum-stability" : "stable"
 }

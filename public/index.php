@@ -7,6 +7,7 @@ require_once 'vendor/autoload.php';
 use Base\Run\Component\BootstrapWorkerDC;
 use Base\Run\RoutingProcessor;
 use Monolog\Handler\RotatingFileHandler;
+use Verse\Di\Env;
 use Verse\Run\RunContext;
 use Verse\Run\RunCore;
 use Verse\Run\RuntimeLog;
@@ -47,6 +48,8 @@ $context->fill([
 $runtime = new RuntimeLog($context->get(RunContext::IDENTITY));
 $runtime->pushHandler(new RotatingFileHandler(dirname(__DIR__).'/logs/out.log'));
 $runtime->catchErrors();
+
+Env::getContainer()->setModule(\Psr\Log\LoggerInterface::class, $runtime);
 
 $core = new RunCore();
 $core->setContext($context);

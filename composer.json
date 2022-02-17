@@ -16,10 +16,9 @@
     },
     "require": {
         "verse/run": "^0.0.9",
-        "verse/storage": "^0.0.10",
+        "verse/storage": "^1.0",
         "verse/modular": "^1.0",
-        "verse/router": "^1.1.1",
-        "verse/telegram" : "^0.1",
+        "verse/telegram" : "dev-main",
         "ext-json": "*",
         "vlucas/phpdotenv": "^5.3",
         "vetermanve/background_multiprocessor": "^0.9",

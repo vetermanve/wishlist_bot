@@ -13,6 +13,6 @@ class Landing extends TelegramRunController
 {
     public function text_message(): ?TelegramResponse
     {
-        return $this->textResponse(implode('', CachedEmoji::getRandomEmoji(4)));
+        return $this->textResponse('Не понял команды "' . $this->p('text').'"');
     }
 }

@@ -3,15 +3,13 @@
 namespace App\Wishlist\Controller;
 
 use App\Wishlist\Service\WishlistUserStorage;
-use Psr\Log\LoggerInterface;
 use Run\Controller\TelegramExtendedController;
-use Verse\Di\Env;
-use Verse\Run\RunContext;
 use Verse\Run\Util\Uuid;
+use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;
-use Verse\Telegram\Run\Controller\TelegramRunController;
+use Verse\Telegram\Run\Spec\DisplayControl;
 
-class Create extends TelegramExtendedController {
+class Remove extends TelegramExtendedController {
 
     public function text_message(): ?TelegramResponse
     {
@@ -21,15 +19,15 @@ class Create extends TelegramExtendedController {
         $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
 
         if ($listId) {
-            return $this->response()->setText('Твой вишлист: '.$listId)
-                ->addKeyboardKey('Посмотреть', '/wishlist?id='.$listId);
+            $storage->write()->remove($userId, __METHOD__);
 
-        } else {
-            $listId = Uuid::v4();
-            $result = $storage->write()->insert($userId, [WishlistUserStorage::WISHLIST_ID => $listId],  __METHOD__);
+            return $this->response()->setText('Твой вишлист удален!: '.$listId)
+                ->addKeyboardKey('Создать новый', '/wishlist_create?'.DisplayControl::PARAM_SET_APPEARANCE.'='.MessageRoute::APPEAR_NEW_MESSAGE)
+                ;
+
         }
 
-        return $this->textResponse("Твой вишлист создан: " . $listId);
+        return $this->textResponse("В данный момент у тебя нет вишлиста");
     }
 
     public function callback_query(): ?TelegramResponse

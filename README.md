@@ -1,2 +1,10 @@
-# Emoji roll bot
-Bot that telling a future generating 4 random Emoji 
+# Wishlist bot
+Bot that helps manage and distribute wishlits
+
+## Installation
+
+```cp .env.local .env```
+
+and set proper variables
+
+ 

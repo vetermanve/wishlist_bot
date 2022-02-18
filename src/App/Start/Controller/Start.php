@@ -3,8 +3,10 @@
 namespace App\Start\Controller;
 
 use App\Wishlist\Service\WishlistStorage;
+use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Run\Controller\TelegramRunController;
+use Verse\Telegram\Run\Spec\DisplayControl;
 
 class Start extends TelegramRunController {
 
@@ -13,7 +15,7 @@ class Start extends TelegramRunController {
     private static $commands = [
         [
             'Cоздать вишлист',
-            '/wishlist_new',
+            '/wishlist_create?'.DisplayControl::PARAM_SET_APPEARANCE.'='.MessageRoute::APPEAR_NEW_MESSAGE,
         ]
     ];
 

@@ -13,6 +13,12 @@ class Landing extends TelegramRunController
 {
     public function text_message(): ?TelegramResponse
     {
+        $text = mb_strtolower($this->p('text'));
+
+        if (strpos($text, 'привет') !== false) {
+            return $this->textResponse('И тебе привет '.($this->p('from')['first_name'] ?? '').'!');
+        }
+
         return $this->textResponse('Не понял команды "' . $this->p('text').'"');
     }
 }

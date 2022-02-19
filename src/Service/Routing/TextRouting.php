@@ -18,8 +18,17 @@ class TextRouting implements TextRouterInterface
     {
         $data = [];
         $originalText = $request->getParamOrData('text');
+        if (!$originalText) {
+//            $originalResource = $request->getResource();
+//            if (strlen($originalResource) > 1) {
+//                $originalText = mb_substr($originalResource, 1);
+//            } else {
+                return null;
+//            }
+        }
+
         $text = mb_strtolower($originalText);
-        Env::getContainer()->bootstrap('logger')->debug('CALLLLEEED', ['text' => $text, ]);
+
         $resource = null;
 
         if ($text === 'хватит') {

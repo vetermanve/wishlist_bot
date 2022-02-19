@@ -14,11 +14,18 @@ class Draft extends TelegramExtendedController
 {
     public function text_message(): ?TelegramResponse
     {
+        $this->setNextResource('/item_draft');
+
         $text = $this->p('text');
+
         if (!$text) {
-            $this->setNextResource('/item_draft');
             return $this->textResponse('Что ты хочешь? Напиши!')
                 ->addKeyboardKey('Пока не хочу','/done', MessageRoute::APPEAR_CALLBACK_ANSWER);
+        }
+
+        if (mb_eregi('ничего|закончил|хватит', $text) !== false) {
+            $this->setNextResource(null);
+            return $this->textResponse("Хорошо, закончили");
         }
 
         $storage = new ItemStorage();
@@ -36,7 +43,7 @@ class Draft extends TelegramExtendedController
                 MessageRoute::APPEAR_CALLBACK_ANSWER
             )
             ->addKeyboardKey('Показать все желания', '/item_all', [ 'iid' => $id ])
-            ->addKeyboardKey('Пока всё, ничего больше не хочу.', '/done', [], MessageRoute::APPEAR_CALLBACK_ANSWER)
+            ->addKeyboardKey('Давай закончим.', '/done', [], MessageRoute::APPEAR_CALLBACK_ANSWER)
             ;
 
     }

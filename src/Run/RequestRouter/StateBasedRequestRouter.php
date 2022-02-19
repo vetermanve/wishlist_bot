@@ -6,7 +6,6 @@ namespace Run\RequestRouter;
 
 use Psr\Log\LoggerInterface;
 use Run\RequestRouter\Spec\TelegramRequestRouterState;
-use Run\Storage\UserStateStorage;
 use Verse\Di\Env;
 use Verse\Run\RunRequest;
 use Verse\Storage\StorageProto;
@@ -15,8 +14,6 @@ use Verse\Telegram\Run\RequestRouter\TelegramRouterByMessageType;
 
 class StateBasedRequestRouter extends TelegramRouterByMessageType
 {
-    private $defaultRouteController;
-
     /**
      * @var StorageProto
      */
@@ -27,17 +24,9 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
      */
     private $textRouter;
 
-    /**
-     * StateBasedRequestRouter constructor.
-     */
-    public function __construct()
-    {
-        $this->defaultRouteController = '\\' . self::DEFAULT_MODULE . '\\Controller\\' . self::DEFAULT_CONTROLLER;
-    }
-
     public function getClassByRequest(RunRequest $request)
     {
-        $controllerClass = parent::getClassByRequest($request);
+        $baseControllerClass = parent::getClassByRequest($request);
 
         /**
          * @var $logger LoggerInterface::class
@@ -45,11 +34,19 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
         $logger = Env::getContainer()->bootstrap('logger');
 
         $logger->info("ROUTER CLASS", [
-            'class' => $controllerClass,
+            'class' => $baseControllerClass,
         ]);
-        // all ok, resource was found
-        if (!$this->isDefaultRoute($controllerClass)) {
-            return $controllerClass;
+
+        // if resource is not default route returning it
+        if ($baseControllerClass !== $this->buildClassName($this->_defaultModuleName , $this->_defaultControllerName)) {
+            return $baseControllerClass;
+        }
+
+
+        if (($request->getParamOrData('text')[0] ?? '') === '!' ) {
+            $request->params['text'] = mb_substr($request->getParamOrData('text'), 1);
+            $textControllerClass = $this->getTextRouting($request);
+            return $textControllerClass ?? $baseControllerClass;
         }
 
         if ($this->stateStorage) {
@@ -63,39 +60,51 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             }
         }
 
-        $resource = $request->getChannelState()->get(TelegramRequestRouterState::RESOURCE);
+        $stateResource = $request->getChannelState()->get(TelegramRequestRouterState::RESOURCE);
 
-        $logger->debug("");
-        if ($resource)  {
-            $request->setResource($resource);
+        if ($stateResource)  {
+            if ($request->getParamOrData('text') === '') {
+                $request->params['text'] = mb_substr($request->getResource(), 1);
+            }
+
+            $request->setResource($stateResource);
             $data = $request->getChannelState()->get(TelegramRequestRouterState::DATA);
             if (is_array($data)) {
                 $request->data = $data + $request->data;
             }
 
             return parent::getClassByRequest($request);
-        } elseif (isset($this->textRouter)) {
-            $textRouterResult = $this->textRouter->getClassAndData($request);
-            if (is_array($textRouterResult)) {
-                [$resource, $data] = $textRouterResult;
-
-                if ($resource && is_string($resource)) {
-                    if (is_array($data)) {
-                        $request->data = $data + $request->data;
-                    }
-                    $request->setResource($resource);
-                    return parent::getClassByRequest($request);
-                }
+        } else {
+            $textControllerClass = $this->getTextRouting($request);
+            if ($textControllerClass ) {
+                return $textControllerClass;
             }
         }
 
-        return $controllerClass;
+        return $baseControllerClass;
     }
 
+    protected function getTextRouting (RunRequest $request) : ?string {
+        if (!isset($this->textRouter)) {
+            return null;
+        }
 
-    private function isDefaultRoute($controller) : bool  {
-        return $this->defaultRouteController === $controller;
+        $textRouterResult = $this->textRouter->getClassAndData($request);
+        if (is_array($textRouterResult)) {
+            [$resource, $data] = $textRouterResult;
+
+            if ($resource && is_string($resource)) {
+                if (is_array($data)) {
+                    $request->data = $data + $request->data;
+                }
+                $request->setResource($resource);
+                return parent::getClassByRequest($request);
+            }
+        }
+
+        return null;
     }
+
 
     /**
      * @return TextRouterInterface

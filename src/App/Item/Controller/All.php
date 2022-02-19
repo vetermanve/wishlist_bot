@@ -16,7 +16,6 @@ class All extends TelegramExtendedController
     public function text_message(): ?TelegramResponse
     {
         $storage = new ItemStorage();
-        $id = Uuid::v4();
 
         $filters = [
             [ItemStorage::USER_ID,  Compare::EQ, $this->getUserId()]

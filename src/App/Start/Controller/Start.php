@@ -25,7 +25,7 @@ class Start extends TelegramRunController {
 
     public function text_message(): ?TelegramResponse
     {
-        $response = $this->textResponse("Привет! \nЗдесь ты можешь создать свой вишлись и подписываться на вишлисты друзей!\n"
+        $response = $this->textResponse("Привет! \nЗдесь ты можешь создать свой вишлист и подписываться на вишлисты друзей!\n"
             . "Список доступных комманд\n" );
 
         foreach (self::$commands as $item) {

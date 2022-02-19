@@ -27,7 +27,7 @@ class Clear extends TelegramExtendedController
 
         $storage->write()->removeBatch($ids, __METHOD__);
 
-        return $this->textResponse("Removed: \n:".implode("\n", array_column($items, ItemStorage::NAME)));
+        return $this->textResponse("Removed: \n".implode("\n - ", array_column($items, ItemStorage::NAME)));
 
 //
 //

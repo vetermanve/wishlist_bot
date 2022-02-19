@@ -37,7 +37,8 @@ class Name extends TelegramExtendedController {
 //        $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
 
         if ($result) {
-            return $this->response()->setText('Твой вишлист: '.json_encode($result))
+            $this->setNextResource(null);
+            return $this->response()->setText('Записал: "' .$bind[WishlistStorage::NAME].'"')
                 ->addKeyboardKey('Сменить название', '/wishlist_name',
                     [
                         'lid' => $listId,
@@ -58,7 +59,7 @@ class Name extends TelegramExtendedController {
         }
 
         $this->setNextResource('/wishlist_name', ['lid' => $listId]);
-        return $this->textResponse("Напиши имя для вишлиста " . $listId);
+        return $this->textResponse("Придумай и напиши новое название для вишлиста");
     }
 
 

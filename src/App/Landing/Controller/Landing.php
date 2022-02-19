@@ -4,15 +4,14 @@
 namespace App\Landing\Controller;
 
 
-use Service\Emoji\CachedEmoji;
-use Spatie\Emoji\Emoji;
+use Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
-use Verse\Telegram\Run\Controller\TelegramRunController;
 
-class Landing extends TelegramRunController
+class Landing extends TelegramExtendedController
 {
     public function text_message(): ?TelegramResponse
     {
+        $this->setNextResource(null);
         $text = mb_strtolower($this->p('text'));
 
         if (strpos($text, 'привет') !== false) {

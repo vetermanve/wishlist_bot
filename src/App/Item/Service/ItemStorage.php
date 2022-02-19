@@ -12,10 +12,11 @@ use Verse\Storage\StorageDependency;
 
 class ItemStorage extends SimpleStorage
 {
-
+    const ID = 'id';
     const NAME = "name";
     const PRICE = "price";
     const LINK = "link";
+    const CREATED_AT = "created_at";
     const USER_ID = "uid";
 
     public function loadConfig()

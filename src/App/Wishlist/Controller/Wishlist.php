@@ -2,6 +2,8 @@
 
 namespace App\Wishlist\Controller;
 
+use App\Item\Controller\All;
+use App\Item\Controller\Draft;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
 use Run\Controller\TelegramExtendedController;
@@ -19,8 +21,8 @@ class Wishlist extends TelegramExtendedController {
         $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
 
         if (!$listId) {
-            return  $this->textResponse('У тебя еще не создан вишлист!')
-                ->addKeyboardKey('Создать', '/wishlist_create')
+            return $this->textResponse('У тебя еще не создан вишлист!')
+                ->addKeyboardKey('Создать', $this->getResourceByClass(Create::class))
             ;
         }
 
@@ -34,8 +36,10 @@ class Wishlist extends TelegramExtendedController {
         }
 
         return $this->textResponse($text)
-            ->addKeyboardKey($buttonText, '/wishlist_name', [ 'lid' => $listId, ])
-            ;
+            ->addKeyboardKey($buttonText, $this->getResourceByClass(Name::class), [ 'lid' => $listId, ])
+            ->addKeyboardKey("Добавить желание", $this->getResourceByClass(Draft::class), [ 'lid' => $listId, ])
+            ->addKeyboardKey("Посмотреть желания", $this->getResourceByClass(All::class), [ 'lid' => $listId, ])
+        ;
     }
 
     public function callback_query(): ?TelegramResponse

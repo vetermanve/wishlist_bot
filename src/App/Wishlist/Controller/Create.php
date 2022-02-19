@@ -21,15 +21,19 @@ class Create extends TelegramExtendedController {
         $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
 
         if ($listId) {
-            return $this->response()->setText('Твой вишлист: '.$listId)
-                ->addKeyboardKey('Посмотреть', '/wishlist?id='.$listId);
-
+            $text = 'Твой вишлист: '.$listId;
         } else {
             $listId = Uuid::v4();
             $result = $storage->write()->insert($userId, [WishlistUserStorage::WISHLIST_ID => $listId],  __METHOD__);
+            $text = "Твой вишлист создан: " . $listId;
         }
 
-        return $this->textResponse("Твой вишлист создан: " . $listId);
+        return $this->textResponse($text)
+            ->addKeyboardKey('Задать название', '/wishlist_name',
+                [
+                    'lid' => $listId,
+                ])
+            ;
     }
 
     public function callback_query(): ?TelegramResponse

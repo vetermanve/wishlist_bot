@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Wishlist\Service;
+namespace Run\Storage;
 
 
 use Verse\Storage\Data\JBaseDataAdapter;
@@ -10,10 +10,8 @@ use Verse\Storage\SimpleStorage;
 use Verse\Storage\StorageContext;
 use Verse\Storage\StorageDependency;
 
-class WishlistStorage extends SimpleStorage
+class UserStateStorage extends SimpleStorage
 {
-
-    const NAME = "n";
 
     public function loadConfig()
     {
@@ -28,7 +26,7 @@ class WishlistStorage extends SimpleStorage
         // set database (folder) name
         $adapter->setDatabase('we_wishlist');
         // set table (folder) name
-        $adapter->setResource('wishlist');
+        $adapter->setResource('user_state');
 
         $this->getDiContainer()->setModule(StorageDependency::DATA_ADAPTER, $adapter);
     }

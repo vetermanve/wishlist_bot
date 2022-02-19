@@ -3,12 +3,13 @@
 require_once __DIR__.'/../bootstrap.php';
 
 use Monolog\Handler\RotatingFileHandler;
+use Run\Scheme\TelegramPullExtendedScheme;
 use Verse\Run\RunContext;
 use Verse\Run\RunCore;
 use Verse\Run\RuntimeLog;
 
 // start build schema
-$schema = new \Verse\Telegram\Run\Scheme\TelegramPullScheme();
+$schema = new TelegramPullExtendedScheme();
 
 $context = new RunContext();
 $role = 'TelegramProvider';

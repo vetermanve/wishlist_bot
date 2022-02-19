@@ -49,8 +49,6 @@ $runtime = new RuntimeLog($context->get(RunContext::IDENTITY));
 $runtime->pushHandler(new RotatingFileHandler(dirname(__DIR__).'/logs/out.log'));
 $runtime->catchErrors();
 
-Env::getContainer()->setModule(\Psr\Log\LoggerInterface::class, $runtime);
-
 $core = new RunCore();
 $core->setContext($context);
 $core->setSchema($schema);

@@ -4,6 +4,7 @@
 namespace Run\Controller;
 
 
+use Run\RequestRouter\Spec\TelegramRequestRouterState;
 use Verse\Telegram\Run\Controller\TelegramRunController;
 
 class TelegramExtendedController extends TelegramRunController
@@ -16,5 +17,10 @@ class TelegramExtendedController extends TelegramRunController
         }
 
         return null;
+    }
+
+    public function setNextResource($resource, $data = null, $ttl = null) {
+        $this->setState(TelegramRequestRouterState::RESOURCE, $resource, $ttl);
+        $this->setState(TelegramRequestRouterState::DATA, $data, $ttl);
     }
 }

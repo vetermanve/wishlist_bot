@@ -40,7 +40,10 @@ class Edit extends TelegramExtendedController
 
         if(isset($field)) {
             if (!$text) {
-                $this->setNextResource($classResource, ['f' => $field]);
+                $this->setNextResource($classResource, [
+                    'f' => $field,
+                    'iid' => $itemId,
+                ]);
                 switch ($field) {
                     case ItemStorage::NAME:
                         $text = "Текущий заголовок \"{$item[ItemStorage::NAME]}\"\nВведи новый:";

@@ -35,6 +35,10 @@ class TextRouting implements TextRouterInterface
             $resource = '/done';
         }
 
+        if ($text === 'покажи') {
+            $resource = '/item_all';
+        }
+
         if ($text === 'rename') {
             $resource = '/wishlist_name';
         }

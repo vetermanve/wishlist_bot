@@ -16,6 +16,10 @@ class Start extends TelegramRunController {
         [
             'Cоздать вишлист',
             '/wishlist_create?'.DisplayControl::PARAM_SET_APPEARANCE.'='.MessageRoute::APPEAR_NEW_MESSAGE,
+        ],
+        [
+        'Добавить женание',
+            '/item_draft?'.DisplayControl::PARAM_SET_APPEARANCE.'='.MessageRoute::APPEAR_NEW_MESSAGE,
         ]
     ];
 

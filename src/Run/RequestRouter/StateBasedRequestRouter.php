@@ -9,6 +9,7 @@ use Run\RequestRouter\Spec\TelegramRequestRouterState;
 use Run\Storage\UserStateStorage;
 use Verse\Di\Env;
 use Verse\Run\RunRequest;
+use Verse\Storage\StorageProto;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\RequestRouter\TelegramRouterByMessageType;
 
@@ -16,7 +17,15 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
 {
     private $defaultRouteController;
 
+    /**
+     * @var StorageProto
+     */
     private $stateStorage;
+
+    /**
+     * @var TextRouterInterface
+     */
+    private $textRouter;
 
     /**
      * StateBasedRequestRouter constructor.
@@ -24,20 +33,10 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
     public function __construct()
     {
         $this->defaultRouteController = '\\' . self::DEFAULT_MODULE . '\\Controller\\' . self::DEFAULT_CONTROLLER;
-        $this->stateStorage = new UserStateStorage();
     }
 
     public function getClassByRequest(RunRequest $request)
     {
-        $state = $request->getChannelState();
-
-        $chatId = (new MessageRoute($request->getReply()))->getChatId();
-        $stateData = $this->stateStorage->read()->get($chatId, __METHOD__, []);
-
-        if (!empty($stateData)) {
-            $state->setPacked($stateData);
-        }
-
         $controllerClass = parent::getClassByRequest($request);
 
         /**
@@ -53,6 +52,17 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             return $controllerClass;
         }
 
+        if ($this->stateStorage) {
+            $state = $request->getChannelState();
+
+            $chatId = (new MessageRoute($request->getReply()))->getChatId();
+            $stateData = $this->stateStorage->read()->get($chatId, __METHOD__, []);
+
+            if (!empty($stateData)) {
+                $state->setPacked($stateData);
+            }
+        }
+
         $resource = $request->getChannelState()->get(TelegramRequestRouterState::RESOURCE);
 
         $logger->debug("");
@@ -64,6 +74,19 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             }
 
             return parent::getClassByRequest($request);
+        } elseif (isset($this->textRouter)) {
+            $textRouterResult = $this->textRouter->getClassAndData($request);
+            if (is_array($textRouterResult)) {
+                [$resource, $data] = $textRouterResult;
+
+                if ($resource && is_string($resource)) {
+                    if (is_array($data)) {
+                        $request->data = $data + $request->data;
+                    }
+                    $request->setResource($resource);
+                    return parent::getClassByRequest($request);
+                }
+            }
         }
 
         return $controllerClass;
@@ -72,5 +95,37 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
 
     private function isDefaultRoute($controller) : bool  {
         return $this->defaultRouteController === $controller;
+    }
+
+    /**
+     * @return TextRouterInterface
+     */
+    public function getTextRouter(): TextRouterInterface
+    {
+        return $this->textRouter;
+    }
+
+    /**
+     * @param TextRouterInterface $textRouter
+     */
+    public function setTextRouter(TextRouterInterface $textRouter): void
+    {
+        $this->textRouter = $textRouter;
+    }
+
+    /**
+     * @return StorageProto
+     */
+    public function getStateStorage(): StorageProto
+    {
+        return $this->stateStorage;
+    }
+
+    /**
+     * @param StorageProto $stateStorage
+     */
+    public function setStateStorage(StorageProto $stateStorage): void
+    {
+        $this->stateStorage = $stateStorage;
     }
 }

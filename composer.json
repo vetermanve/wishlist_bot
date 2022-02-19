@@ -24,7 +24,8 @@
         "vetermanve/background_multiprocessor": "^0.9",
         "irazasyed/telegram-bot-sdk": "^3.4",
         "phpunit/phpunit": "^9.5",
-        "spatie/emoji": "^3.0"
+        "spatie/emoji": "^3.0",
+      "ext-mbstring": "*"
     },
     "minimum-stability" : "stable"
 }

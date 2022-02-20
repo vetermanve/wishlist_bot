@@ -5,6 +5,7 @@ namespace App\Item\Controller;
 
 
 use App\Item\Service\ItemStorage;
+use App\Wishlist\Controller\Wishlist;
 use Run\Controller\TelegramExtendedController;
 use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Controller\TelegramResponse;
@@ -22,7 +23,9 @@ class Delete extends TelegramExtendedController
 
         $storage->write()->remove($id,__METHOD__);
 
-        return $this->textResponse('Запись удалена');
+        return $this->textResponse('Запись удалена')
+            ->addKeyboardKey('Вернуться к списку', $this->r(All::class))
+        ;
     }
 
     public function callback_query(): ?TelegramResponse

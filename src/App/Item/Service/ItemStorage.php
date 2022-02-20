@@ -14,9 +14,9 @@ class ItemStorage extends SimpleStorage
 {
     const ID = 'id';
     const NAME = "name";
-    const PRICE = "price";
-    const LINK = "link";
-    const CREATED_AT = "created_at";
+    const PRICE = "pr";
+    const LINK = "lnk";
+    const CREATED_AT = "cr_at";
     const USER_ID = "uid";
 
     public function loadConfig()

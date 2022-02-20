@@ -5,6 +5,7 @@ namespace App\Item\Controller;
 
 
 use App\Item\Service\ItemStorage;
+use App\Wishlist\Controller\Wishlist;
 use Run\Controller\TelegramExtendedController;
 use Verse\Run\Util\Uuid;
 use Verse\Storage\Spec\Compare;
@@ -38,6 +39,12 @@ class Edit extends TelegramExtendedController
             $field = null;
         }
 
+        $editOptions = [
+            ItemStorage::NAME => 'Название',
+            ItemStorage::PRICE => 'Цену',
+            ItemStorage::LINK => 'Ссылку'
+        ];
+
         if(isset($field)) {
             if (!$text) {
                 $this->setNextResource($classResource, [
@@ -50,10 +57,9 @@ class Edit extends TelegramExtendedController
                         break;
                     case ItemStorage::PRICE:
                         $text = "Текущая цена \"{$item[ItemStorage::PRICE]}\"\nВведи новую:";
-                        $this->setNextResource($classResource);
                         break;
                     case ItemStorage::LINK:
-                        $text = "Текущая ссылка \"{$item[ItemStorage::PRICE]}\"\nВведи новую:";
+                        $text = "Текущая ссылка \"{$item[ItemStorage::LINK]}\"\nВведи новую:";
                         break;
                 }
 
@@ -63,22 +69,36 @@ class Edit extends TelegramExtendedController
                     $field => $text
                 ], __METHOD__);
 
-                var_dump($result);
-
                 if($result) {
                     $this->setNextResource(null);
 
-                    return $this->textResponse("Записано! ".self::$allowedFields[$field].' = '. $text);
+                    $response = $this->textResponse("Записано! ".self::$allowedFields[$field].' = '. $text
+                        . "\nИзменить еще:"
+                    );
+
+                    unset($editOptions[$field]);
+
+                    foreach ($editOptions as $field => $text) {
+                        $response->addKeyboardKey($text, $classResource, ['iid' => $itemId, 'f' => $field]);
+                    }
+
+                    return $response
+                        ->addKeyboardKey('Вернуться к списку', $this->r(All::class));
+                    ;
+
                 } else {
                     return $this->textResponse("Не получилось записать =( ");
                 }
             }
         }
 
-        return $this->textResponse('Что ты хочешь отредактировать?')
-            ->addKeyboardKey('Название', $classResource, ['iid' => $itemId, 'f' => ItemStorage::NAME])
-            ->addKeyboardKey('Цену', $classResource, ['iid' => $itemId, 'f' => ItemStorage::NAME])
-            ->addKeyboardKey('Ссылку', $classResource, ['iid' => $itemId, 'f' => ItemStorage::NAME]);
+        $response = $this->textResponse('Что ты хочешь отредактировать?');
+
+        foreach ($editOptions as $field => $text) {
+            $response->addKeyboardKey($text, $classResource, ['iid' => $itemId, 'f' => $field]);
+        }
+
+        return $response;
     }
 
 }

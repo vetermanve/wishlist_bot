@@ -35,6 +35,10 @@ class TelegramExtendedController extends TelegramRunController
         return $this->setNextResource($resource, $data, $ttl);
     }
 
+    protected function r($className) {
+        return $this->getResourceByClass($className);
+    }
+
     protected function getResourceByClass($className) {
         $className = strtr($className,[
             'App\\' => '',

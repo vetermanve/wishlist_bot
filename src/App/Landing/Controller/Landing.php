@@ -4,6 +4,8 @@
 namespace App\Landing\Controller;
 
 
+use App\Item\Controller\All;
+use App\Wishlist\Controller\Wishlist;
 use Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
@@ -18,6 +20,9 @@ class Landing extends TelegramExtendedController
             return $this->textResponse('И тебе привет '.($this->p('from')['first_name'] ?? '').'!');
         }
 
-        return $this->textResponse('Не понял команды "' . $this->p('text').'"');
+        return $this->textResponse('Не понял команды "' . $this->p('text').'"')
+            ->addKeyboardKey('Все вишлисты', $this->getResourceByClass(Wishlist::class))
+            ->addKeyboardKey('Все желания', $this->getResourceByClass(All::class))
+            ;
     }
 }

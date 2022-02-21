@@ -33,9 +33,12 @@ class All extends TelegramExtendedController
             $text.= "\n - ".$item[ItemStorage::NAME];
         }
 
+        $this->setState('edit_mode', false);
+
         return $this->textResponse($text)
-            ->addKeyboardKey('Управлять желаниями', $this->getResourceByClass(EditMode::class), [],MessageRoute::APPEAR_EDIT_MESSAGE)
-            ->addKeyboardKey('Обновить', $this->getResourceByClass(All::class),  [],MessageRoute::APPEAR_EDIT_MESSAGE)
+            ->addKeyboardKey('Добавить желание', $this->r(Draft::class), [])
+            ->addKeyboardKey('Управлять желаниями', $this->r(EditMode::class), [],MessageRoute::APPEAR_EDIT_MESSAGE)
+            ->addKeyboardKey('Обновить список', $this->r(All::class),  [],MessageRoute::APPEAR_EDIT_MESSAGE)
         ;
     }
 

@@ -5,9 +5,9 @@ namespace App\Item\Controller;
 
 
 use App\Item\Service\ItemStorage;
-use App\Wishlist\Controller\Wishlist;
+use App\Wishlist\Service\WishlistStorage;
+use App\Wishlist\Service\WishlistUserStorage;
 use Run\Controller\TelegramExtendedController;
-use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Delete extends TelegramExtendedController
@@ -19,12 +19,37 @@ class Delete extends TelegramExtendedController
             return $this->textResponse('Не знаю что удалить');
         }
 
-        $storage = new ItemStorage();
+        $itemStorage = new ItemStorage();
+        $result = $itemStorage->write()->remove($id,__METHOD__);
+        if (!$result) {
+            return $this->textResponse('Не удалось удалить запись.');
+        }
 
-        $storage->write()->remove($id,__METHOD__);
+        $text = 'Запись удалена из списка всех желаний';
 
-        return $this->textResponse('Запись удалена')
-            ->addKeyboardKey('Вернуться к списку', $this->r(All::class))
+        $userWishlistStorage = new WishlistUserStorage();
+        $userListData = $userWishlistStorage->read()->get($this->getUserId(),__METHOD__);
+
+        if ($userListData) {
+            $listId = $userListData[WishlistUserStorage::WISHLIST_ID];
+            $wishlistStorage = new WishlistStorage();
+
+            $listData = $wishlistStorage->read()->get($listId, __METHOD__);
+
+            if ($listData) {
+                $items = $listData[WishlistStorage::ITEMS];
+                $key = array_search($id, $items);
+
+                if ($key !== false) {
+                    unset($items[$key]);
+                    $wishlistStorage->write()->update($listId, [WishlistStorage::ITEMS => array_values($items)], __METHOD__);
+                    $text .= ' и из списка "'.$listData[WishlistStorage::NAME].'"';
+                }
+            }
+        }
+
+        return $this->textResponse($text)
+            ->addKeyboardKey('Вернуться к списку', '!list')
         ;
     }
 

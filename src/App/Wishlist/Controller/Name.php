@@ -2,18 +2,18 @@
 
 namespace App\Wishlist\Controller;
 
+use App\Item\Controller\Draft;
 use App\Wishlist\Service\WishlistStorage;
-use App\Wishlist\Service\WishlistUserStorage;
-use Psr\Log\LoggerInterface;
+use Exception;
 use Run\Controller\TelegramExtendedController;
-use Verse\Di\Env;
-use Verse\Run\RunContext;
-use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Controller\TelegramResponse;
-use Verse\Telegram\Run\Controller\TelegramRunController;
 
 class Name extends TelegramExtendedController {
 
+    /**
+     * @return TelegramResponse|null
+     * @throws Exception
+     */
     public function text_message(): ?TelegramResponse
     {
         $listId = $this->p('lid');
@@ -22,30 +22,21 @@ class Name extends TelegramExtendedController {
         }
 
         $storage = new WishlistStorage();
-        $listData = $storage->read()->get($listId, __METHOD__);
+//        $listData = $storage->read()->get($listId, __METHOD__);
 
         $bind = [
             WishlistStorage::NAME => $this->p('text')
         ];
 
-//        if (!$listData) {
-//            return $this->textResponse("Лист передан, но я не могу найти по нему данные!");
-//        }
-
         $result = $storage->write()->update($listId, $bind, __METHOD__);
-
-//        $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
 
         if ($result) {
             $this->setNextResource(null);
-            return $this->response()->setText('Записал: "' .$bind[WishlistStorage::NAME].'"')
-                ->addKeyboardKey('Сменить название', '/wishlist_name',
-                    [
-                        'lid' => $listId,
-                    ])
-                ->addKeyboardKey('К списку вишлистов', '/wishlist')
+            return $this->textResponse('Записал: "' .$bind[WishlistStorage::NAME].'"')
+                ->addKeyboardKey('Изменить название', $this->r(Name::class), [ 'lid' => $listId,])
+                ->addKeyboardKey('Перейти к вишлисту', $this->r(Wishlist::class))
+                ->addKeyboardKey('Добавить желание', $this->r(Draft::class))
                 ;
-
         }
 
         return $this->textResponse("Что-то пошло не так и переименовать не удалось\n /done чтобы закончить именовать." );

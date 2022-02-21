@@ -4,6 +4,7 @@
 namespace App\Item\Controller;
 
 
+use App\Done\Controller\Done;
 use App\Item\Service\ItemStorage;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
@@ -22,7 +23,7 @@ class Draft extends TelegramExtendedController
 
         if (!$text) {
             return $this->textResponse('Что ты хочешь? Напиши!')
-                ->addKeyboardKey('Пока не хочу','/done', MessageRoute::APPEAR_CALLBACK_ANSWER);
+                ->addKeyboardKey('Пока не хочу', '/done', MessageRoute::APPEAR_CALLBACK_ANSWER);
         }
 
         if (mb_eregi('ничего|закончил|хватит', $text) !== false) {
@@ -31,18 +32,24 @@ class Draft extends TelegramExtendedController
         }
 
         $listId = $this->p('lid');
-        if ($listId) {
+        if (!$listId) {
             $listId = $this->getState('lid');
             if (!$listId) {
                 $userWishlistStorage = new WishlistUserStorage();
-                $listData = $userWishlistStorage->read()->get($this->getUserId(), __METHOD__);
-                if (!$listData) {
+                $userListData = $userWishlistStorage->read()->get($this->getUserId(), __METHOD__);
+                if (!$userListData) {
                     return $this->textResponse('Я не нашел вишлиста куда добавить. Нужно бы его создать.')
-                        ->addKeyboardKey('Создать вишлист','/wishlist_create');
+                        ->addKeyboardKey('Создать вишлист', '/wishlist_create');
                 }
 
-                $listId = $listData[WishlistUserStorage::WISHLIST_ID];
+                $listId = $userListData[WishlistUserStorage::WISHLIST_ID];
             }
+        }
+
+        $listData = [];
+        if ($listId) {
+            $listStorage = new WishlistStorage();
+            $listData = $listStorage->read()->get($listId, __METHOD__);
         }
 
         $storage = new ItemStorage();
@@ -54,26 +61,37 @@ class Draft extends TelegramExtendedController
             ItemStorage::CREATED_AT => time(),
         ], __METHOD__);
 
-        if ($writeResult) {
-            $wishlistStorage = new WishlistStorage();
-            $listData = $wishlistStorage->read()->get($listId, __METHOD__);
-            $items = array_merge($listDatap[WishlistStorage::ITEMS]  ?? [], [$id]);
-
-            $wishlistStorage->write()->update($listId, [
-                WishlistStorage::ITEMS => $items
-            ], __METHOD__);
-
-            return $this->textResponse("Я записал, что ты хочешь: $text\nВ список \"{$listData[WishlistStorage::NAME]}\" \nЧто еще хочешь?"
-            )
-                ->addKeyboardKey('Отменить', '/item_delete', [ 'iid' => $id ],
-                    MessageRoute::APPEAR_CALLBACK_ANSWER
-                )
-                ->addKeyboardKey('Показать все желания', '/item_all', [ 'iid' => $id ])
-                ->addKeyboardKey('Давай закончим.', '/done', [], MessageRoute::APPEAR_CALLBACK_ANSWER)
-                ;
+        if (!$writeResult) {
+            return $this->textResponse('Не удалось записать.');
         }
 
-        return $this->textResponse('Не удалось записать.');
+        $wishlistStorage = new WishlistStorage();
+        $userListData = $wishlistStorage->read()->get($listId, __METHOD__);
+        $items = array_merge($listData[WishlistStorage::ITEMS] ?? [], [$id]);
+
+        $wishlistStorage->write()->update($listId, [
+            WishlistStorage::ITEMS => $items
+        ], __METHOD__);
+
+        $text = "Я записал, что ты хочешь: $text\n";
+        if (!empty($listData)) {
+            if (!is_array($listData[WishlistStorage::ITEMS])) {
+                $listData[WishlistStorage::ITEMS] = [];
+            }
+
+            $listData[WishlistStorage::ITEMS][] = $id;
+
+            $text .= "В список \"{$userListData[WishlistStorage::NAME]}\"\n";
+        } else {
+            $text .= "просто в список твоих желаний, потому что не нашел твоего вишлиста.\n";
+        }
+
+        $text .= "Что еще хочешь?";
+
+        return $this->textResponse($text)
+            ->addKeyboardKey('Отменить', $this->r(Delete::class), ['iid' => $id],MessageRoute::APPEAR_CALLBACK_ANSWER)
+            ->addKeyboardKey('Показать все желания', $this->r(All::class), ['iid' => $id])
+            ->addKeyboardKey('Давай закончим.', $this->r(Done::class), [], MessageRoute::APPEAR_CALLBACK_ANSWER);
     }
 
 }

@@ -39,6 +39,14 @@ class TextRouting implements TextRouterInterface
             $resource = '/item_all';
         }
 
+        if ($text === 'list') {
+            if ($request->getChannelState()->get('edit_mode') === 1) {
+                $resource = '/item_edit_mode';
+            } else {
+                $resource = '/item_all';
+            }
+        }
+
         if ($text === 'rename') {
             $resource = '/wishlist_name';
         }

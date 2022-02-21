@@ -83,7 +83,7 @@ class Edit extends TelegramExtendedController
                     }
 
                     return $response
-                        ->addKeyboardKey('Вернуться к списку', $this->r(All::class));
+                        ->addKeyboardKey('Вернуться к списку', '!list')
                     ;
 
                 } else {

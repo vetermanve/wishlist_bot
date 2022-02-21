@@ -35,19 +35,9 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
 
         $logger->info("ROUTER CLASS", [
             'class' => $baseControllerClass,
+            'resource' => $request->getResource(),
+            'test' => ($request->getResource()[0] ?? ''),
         ]);
-
-        // if resource is not default route returning it
-        if ($baseControllerClass !== $this->buildClassName($this->_defaultModuleName , $this->_defaultControllerName)) {
-            return $baseControllerClass;
-        }
-
-
-        if (($request->getParamOrData('text')[0] ?? '') === '!' ) {
-            $request->params['text'] = mb_substr($request->getParamOrData('text'), 1);
-            $textControllerClass = $this->getTextRouting($request);
-            return $textControllerClass ?? $baseControllerClass;
-        }
 
         if ($this->stateStorage) {
             $state = $request->getChannelState();
@@ -60,9 +50,36 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             }
         }
 
+        var_dump('INCOMING',$request->getChannelState()->pack(true));
+
+        // if resource is not default route returning it
+        if ($baseControllerClass !== $this->buildClassName($this->_defaultModuleName, $this->_defaultControllerName)) {
+            return $baseControllerClass;
+        }
+
+        // forcing text routing
+        $forcingTextRoute = '';
+        switch (true) {
+            case isset($request->params['text'][0]) && $request->params['text'][0] === '!':
+                $forcingTextRoute = $request->params['text'];
+                break;
+            case isset($request->data['text'][0]) && $request->data['text'][0] === '!':
+                $forcingTextRoute = $request->data['text'];
+                break;
+            case ($request->getResource()[0] ?? '') === '!':
+                $forcingTextRoute = $request->getResource();
+                break;
+        }
+
+        if ($forcingTextRoute) {
+            $request->params['text'] = mb_substr($forcingTextRoute, 1);;
+            $textControllerClass = $this->getTextRouting($request);
+            return $textControllerClass ?? $baseControllerClass;
+        }
+
         $stateResource = $request->getChannelState()->get(TelegramRequestRouterState::RESOURCE);
 
-        if ($stateResource)  {
+        if ($stateResource) {
             if ($request->getParamOrData('text') === '') {
                 $request->params['text'] = mb_substr($request->getResource(), 1);
             }
@@ -74,17 +91,22 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             }
 
             return parent::getClassByRequest($request);
-        } else {
-            $textControllerClass = $this->getTextRouting($request);
-            if ($textControllerClass ) {
-                return $textControllerClass;
-            }
+        }
+
+        $textControllerClass = $this->getTextRouting($request);
+        if ($textControllerClass) {
+            return $textControllerClass;
+        }
+
+        if (!$request->getParamOrData('text')) {
+            $request->params['text'] = $request->getResource();
         }
 
         return $baseControllerClass;
     }
 
-    protected function getTextRouting (RunRequest $request) : ?string {
+    protected function getTextRouting(RunRequest $request): ?string
+    {
         if (!isset($this->textRouter)) {
             return null;
         }

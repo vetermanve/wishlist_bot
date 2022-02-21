@@ -6,7 +6,6 @@ namespace App\Item\Controller;
 
 use App\Item\Service\ItemStorage;
 use Run\Controller\TelegramExtendedController;
-use Verse\Run\Util\Uuid;
 use Verse\Storage\Spec\Compare;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;
@@ -45,6 +44,8 @@ class EditMode extends TelegramExtendedController
         }
 
         $this->setNextResourceByClass(EditMode::class);
+
+        $this->setState('edit_mode', 1);
 
         return $this->textResponse($text)
             ->addKeyboardKey('Закончить редактирование', $this->getResourceByClass(All::class), [], MessageRoute::APPEAR_EDIT_MESSAGE)

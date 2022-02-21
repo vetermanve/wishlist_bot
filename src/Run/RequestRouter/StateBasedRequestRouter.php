@@ -50,8 +50,6 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             }
         }
 
-        var_dump('INCOMING',$request->getChannelState()->pack(true));
-
         // if resource is not default route returning it
         if ($baseControllerClass !== $this->buildClassName($this->_defaultModuleName, $this->_defaultControllerName)) {
             return $baseControllerClass;

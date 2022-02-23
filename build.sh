@@ -4,11 +4,25 @@ dockerProject="vetermanve/wishlist"
 commitCount=$(git rev-list --count HEAD);
 branch=$(git rev-parse --abbrev-ref HEAD);
 
+# composing array of tags
+tags=()
 if [[ 'main' == $branch ]]; then
-  tags=" -t $dockerProject:$version.$commitCount -t $dockerProject:latest "
+  tags+=("$dockerProject:latest")
+  tags+=("$dockerProject:$version.$commitCount")
 else
-  tags=" -t $dockerProject:$version.$commitCount-$branch "
+  tags+=("$dockerProject:$version.$commitCount-$branch")
 fi
 
-docker build $tags -f .docker/php-worker-production/Dockerfile .
-docker push
+#adding tag to command
+tagsString=""
+for tag in ${tags[@]}; do
+  tagsString+=' -t '$tag' '
+done
+
+#building image
+docker build $tagsString -f .docker/php-worker-production/Dockerfile .
+
+#buising tags was built
+for tag in ${tags[@]}; do
+  docker push $tag
+done

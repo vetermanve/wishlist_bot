@@ -4,8 +4,13 @@
 namespace Service\Routing;
 
 
+use App\Done\Controller\Done;
+use App\Item\Controller\All;
+use App\Item\Controller\Draft;
+use App\Item\Controller\EditMode;
+use App\Wishlist\Controller\Name;
+use Run\RequestRouter\ResourceCompiler;
 use Run\RequestRouter\TextRouterInterface;
-use Verse\Di\Env;
 use Verse\Run\RunRequest;
 
 class TextRouting implements TextRouterInterface
@@ -19,12 +24,7 @@ class TextRouting implements TextRouterInterface
         $data = [];
         $originalText = $request->getParamOrData('text');
         if (!$originalText) {
-//            $originalResource = $request->getResource();
-//            if (strlen($originalResource) > 1) {
-//                $originalText = mb_substr($originalResource, 1);
-//            } else {
-                return null;
-//            }
+            return null;
         }
 
         $text = mb_strtolower($originalText);
@@ -32,28 +32,28 @@ class TextRouting implements TextRouterInterface
         $resource = null;
 
         if ($text === 'хватит') {
-            $resource = '/done';
+            $resource = ResourceCompiler::fromClassName(Done::class);
         }
 
         if ($text === 'покажи') {
-            $resource = '/item_all';
+            $resource = ResourceCompiler::fromClassName(All::class);
         }
 
         if ($text === 'list') {
             if ($request->getChannelState()->get('edit_mode') === 1) {
-                $resource = '/item_edit_mode';
+                $resource = ResourceCompiler::fromClassName(EditMode::class);
             } else {
-                $resource = '/item_all';
+                $resource = ResourceCompiler::fromClassName(All::class);
             }
         }
 
         if ($text === 'rename') {
-            $resource = '/wishlist_name';
+            $resource = ResourceCompiler::fromClassName(Name::class);
         }
 
         if (($result = mb_eregi_replace( 'хочу', ' ', $originalText)) !== $originalText) {
-            Env::getContainer()->bootstrap('logger')->debug('EREGI', ['text' => $text, 'result' => $result,  ]);
-            $resource = '/item_draft';
+//            Env::getContainer()->bootstrap('logger')->debug('EREGI', ['text' => $text, 'result' => $result,  ]);
+            $resource = ResourceCompiler::fromClassName(Draft::class);
             $data['text'] = $this->mb_ucfirst(trim(preg_replace('/\s+/', ' ', $result)));
         }
 

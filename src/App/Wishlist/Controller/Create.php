@@ -44,7 +44,7 @@ class Create extends TelegramExtendedController {
         $this->setNextResourceByClass(Name::class, ['lid' => $listId, ]);
 
         return $this->textResponse($text)
-            ->addKeyboardKey('Потом продолжу', $this->getResourceByClass(Done::class),
+            ->addKeyboardKey('Потом продолжу', $this->r(Done::class),
                 [
                     'lid' => $listId,
                 ])

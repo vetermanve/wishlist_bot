@@ -22,7 +22,7 @@ class Wishlist extends TelegramExtendedController {
 
         if (!$listId) {
             return $this->textResponse('У тебя еще не создан вишлист!')
-                ->addKeyboardKey('Создать', $this->getResourceByClass(Create::class))
+                ->addKeyboardKey('Создать', $this->r(Create::class))
             ;
         }
 
@@ -36,9 +36,9 @@ class Wishlist extends TelegramExtendedController {
         }
 
         return $this->textResponse($text)
-            ->addKeyboardKey($buttonText, $this->getResourceByClass(Name::class), [ 'lid' => $listId, ])
-            ->addKeyboardKey("Добавить желание", $this->getResourceByClass(Draft::class), [ 'lid' => $listId, ])
-            ->addKeyboardKey("Посмотреть желания", $this->getResourceByClass(All::class), [ 'lid' => $listId, ])
+            ->addKeyboardKey($buttonText, $this->r(Name::class), [ 'lid' => $listId, ])
+            ->addKeyboardKey("Добавить желание", $this->r(Draft::class), [ 'lid' => $listId, ])
+            ->addKeyboardKey("Посмотреть желания", $this->r(All::class), [ 'lid' => $listId, ])
         ;
     }
 

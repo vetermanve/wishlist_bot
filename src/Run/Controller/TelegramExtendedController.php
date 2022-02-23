@@ -4,6 +4,7 @@
 namespace Run\Controller;
 
 
+use Run\RequestRouter\ResourceCompiler;
 use Run\RequestRouter\Spec\TelegramRequestRouterState;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Run\Controller\TelegramRunController;
@@ -40,12 +41,6 @@ class TelegramExtendedController extends TelegramRunController
     }
 
     protected function getResourceByClass($className) {
-        $className = strtr($className,[
-            'App\\' => '',
-            'Controller\\' => '',
-            "\\" => '_'
-        ]);
-
-        return '/'.strtolower($className);
+        return ResourceCompiler::fromClassName($className);
     }
 }

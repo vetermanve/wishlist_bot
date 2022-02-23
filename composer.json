@@ -11,8 +11,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "" : "src/"    
+            "" : "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {"": "tests/"}
     },
     "require": {
         "verse/run": "^1.0",

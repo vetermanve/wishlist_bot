@@ -5,3 +5,4 @@
 /services/active/*/supervise
 composer.lock
 .env.local
+.phpunit.result.cache

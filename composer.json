@@ -28,7 +28,8 @@
         "irazasyed/telegram-bot-sdk": "^3.4",
         "phpunit/phpunit": "^9.5",
         "spatie/emoji": "^3.0",
-      "ext-mbstring": "*"
+      "ext-mbstring": "*",
+        "symfony/console": "^5.4"
     },
     "minimum-stability" : "stable"
 }

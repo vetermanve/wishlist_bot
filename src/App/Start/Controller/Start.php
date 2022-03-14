@@ -2,49 +2,56 @@
 
 namespace App\Start\Controller;
 
+use App\Item\Controller\All;
+use App\Item\Controller\Draft;
+use App\Item\Controller\WList;
+use App\Link\Service\LinkStorage;
+use App\Wishlist\Controller\Search;
+use App\Wishlist\Controller\Wishlist;
 use App\Wishlist\Service\WishlistStorage;
-use Verse\Telegram\Run\Channel\Util\MessageRoute;
+use Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
-use Verse\Telegram\Run\Controller\TelegramRunController;
-use Verse\Telegram\Run\Spec\DisplayControl;
 
-class Start extends TelegramRunController {
-
-    private static $service;
-
-    private static $commands = [
-        [
-            'Cоздать вишлист',
-            '/wishlist_create?'.DisplayControl::PARAM_SET_APPEARANCE.'='.MessageRoute::APPEAR_NEW_MESSAGE,
-        ],
-        [
-        'Добавить женание',
-            '/item_draft?'.DisplayControl::PARAM_SET_APPEARANCE.'='.MessageRoute::APPEAR_NEW_MESSAGE,
-        ]
-    ];
+class Start extends TelegramExtendedController
+{
 
     public function text_message(): ?TelegramResponse
     {
-        $response = $this->textResponse("Привет! \nЗдесь ты можешь создать свой вишлист и подписываться на вишлисты друзей!\n"
-            . "Список доступных комманд\n" );
+        $text = $this->p('text');
+        if ($text) {
+            $linkId = $text;
 
-        foreach (self::$commands as $item) {
-            [$desc, $command] = $item;
-            $response->addKeyboardKey($desc, $command);
+            $linkStorage = new LinkStorage();
+            $link = $linkStorage->read()->get($linkId, __METHOD__);
+            if ($link) {
+               $wlId = $link[LinkStorage::WL_ID];
+               $wlStorage = new WishlistStorage();
+               $list = $wlStorage->read()->get($wlId, __METHOD__);
+               if ($list) {
+                   $text = "Я вижу пришел взглянуть на вишлист \n".
+                       '"' . $list[WishlistStorage::NAME].'"'
+                       . "\nМожно посмотреть его содержимое и подписаться на его обновления.";
+
+
+                   return $this->textResponse($text)
+                       ->addKeyboardKey('Посмотреть желания', $this->r(WList::class), ['lid' => $wlId, ] )
+                       ;
+               }
+            }
         }
+
+        $text = "Привет! \nЗдесь ты можешь создать свой вишлист и подписываться на вишлисты друзей!\n"
+            . "Список доступных комманд\n";
+
+        $response = $this->textResponse($text);
+        $response
+            ->addKeyboardKey('Добавить желание', $this->r(Draft::class))
+            ->addKeyboardKey('Посмотреть все желания', $this->r(All::class))
+            ->addKeyboardKey('Посмотреть свои вишлисты', $this->r(Wishlist::class))
+            ->addKeyboardKey('Найти вишлист', $this->r(Search::class))
+        ;
 
         return $response;
-    }
-
-
-    /**
-     * @return WishlistStorage
-     */
-    private function service() {
-        if (!self::$service) {
-            self::$service = new WishlistStorage();
-        }
-        return self::$service;
     }
 
 }

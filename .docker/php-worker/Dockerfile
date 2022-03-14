@@ -63,7 +63,8 @@ RUN pecl install -o -f amqp             && \
         docker-php-ext-enable memcached && \
     pecl install -o -f redis            && \
         docker-php-ext-enable redis     && \
-    pecl install -o -f xdebug           && \
+    pecl install -o -f xdebug-2.9.2     && \
+        docker-php-ext-enable xdebug    && \
 #   Cleaning up
     rm -rf /tmp/* /var/tmp/*
 # END PHP Installation --------------------------
@@ -106,12 +107,6 @@ ARG PUID=1000
 ENV PUID ${PUID}
 RUN if [ -n "${PUID}" ] && [ "${PUID%:*}" != 0 ]; then \
   usermod -u ${PUID} www-data >/dev/null 2>&1 \
-;fi
-
-# END PHP Configuration --------------------------
-
-RUN if [ ${PHP_INSTALL_XDEBUG} = true ]; then \
-    docker-php-ext-enable xdebug \
 ;fi
 
 #

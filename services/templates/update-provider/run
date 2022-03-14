@@ -2,4 +2,6 @@
 
 exec 2>&1
 
+export XDEBUG_MODE=debug XDEBUG_SESSION=1
+
 exec php /var/www/entrypoint/update_provider.php

@@ -39,6 +39,7 @@ class Wishlist extends TelegramExtendedController {
             ->addKeyboardKey($buttonText, $this->r(Name::class), [ 'lid' => $listId, ])
             ->addKeyboardKey("Добавить желание", $this->r(Draft::class), [ 'lid' => $listId, ])
             ->addKeyboardKey("Посмотреть желания", $this->r(All::class), [ 'lid' => $listId, ])
+            ->addKeyboardKey("Поделиться, Управлять ссылками.", $this->r(\App\Link\Controller\All::class), [ 'lid' => $listId, ])
         ;
     }
 

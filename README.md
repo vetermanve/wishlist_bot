@@ -7,4 +7,7 @@ Bot that helps manage and distribute wishlits
 
 and set proper variables
 
- 
+## Планы
+
+- [ ] Дать другим пользователям возможность находить твои вишлисты
+- [ ] Техническая возможность притворяться другим пользователем 

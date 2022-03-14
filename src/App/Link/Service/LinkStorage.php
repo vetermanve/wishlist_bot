@@ -1,22 +1,27 @@
 <?php
 
 
-namespace App\Wishlist\Service;
+namespace App\Link\Service;
 
 
+use App\Wishlist\Service\WishlistStorage;
 use Verse\Storage\Data\JBaseDataAdapter;
-use Verse\Storage\SimpleJsonStorageTest;
 use Verse\Storage\SimpleStorage;
 use Verse\Storage\StorageContext;
 use Verse\Storage\StorageDependency;
 
-class WishlistStorage extends SimpleStorage
+class LinkStorage extends SimpleStorage
 {
+    /**
+     * Link code
+     */
+    const ID = 'id';
 
-    const NAME = "n";
-    const ITEMS = "items";
-    const LINKS = "links";
-    const EDITORS = "editors";
+    /**
+     * Wishlist ID
+     * @link WishlistStorage
+     */
+    const WL_ID = 'wl_id';
 
     public function loadConfig()
     {
@@ -31,7 +36,7 @@ class WishlistStorage extends SimpleStorage
         // set database (folder) name
         $adapter->setDatabase('we_wishlist');
         // set table (folder) name
-        $adapter->setResource('wishlist');
+        $adapter->setResource('links_to_wishlist');
 
         $this->getDiContainer()->setModule(StorageDependency::DATA_ADAPTER, $adapter);
     }

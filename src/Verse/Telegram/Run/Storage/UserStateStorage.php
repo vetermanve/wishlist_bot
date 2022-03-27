@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Run\Storage;
+namespace Verse\Telegram\Run\Storage;
 
 
 use Verse\Storage\Data\JBaseDataAdapter;

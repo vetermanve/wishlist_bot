@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Run\RequestRouter;
+namespace Verse\Telegram\Run\RequestRouter;
 
 
 use Verse\Run\RunRequest;

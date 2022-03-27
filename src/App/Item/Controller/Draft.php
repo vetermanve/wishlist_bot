@@ -8,7 +8,7 @@ use App\Done\Controller\Done;
 use App\Item\Service\ItemStorage;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;

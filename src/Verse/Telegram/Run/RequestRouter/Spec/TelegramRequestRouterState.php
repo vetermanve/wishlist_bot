@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Run\RequestRouter\Spec;
+namespace Verse\Telegram\Run\RequestRouter\Spec;
 
 
 class TelegramRequestRouterState

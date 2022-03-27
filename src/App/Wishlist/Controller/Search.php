@@ -2,11 +2,7 @@
 
 namespace App\Wishlist\Controller;
 
-use App\Item\Controller\All;
-use App\Item\Controller\Draft;
-use App\Wishlist\Service\WishlistStorage;
-use App\Wishlist\Service\WishlistUserStorage;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Search extends TelegramExtendedController {
@@ -41,6 +37,7 @@ class Search extends TelegramExtendedController {
 //            ->addKeyboardKey("Посмотреть желания", $this->r(All::class), [ 'lid' => $listId, ])
 //            ->addKeyboardKey("Поделиться, Управлять ссылками.", $this->r(\App\Link\Controller\All::class), [ 'lid' => $listId, ])
 //        ;
+        return  $this->textResponse($this->getUserId());
     }
 
     public function callback_query(): ?TelegramResponse

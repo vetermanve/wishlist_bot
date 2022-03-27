@@ -6,7 +6,7 @@ use App\Done\Controller\Done;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
 use Psr\Log\LoggerInterface;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Di\Env;
 use Verse\Run\RunContext;
 use Verse\Run\Util\Uuid;

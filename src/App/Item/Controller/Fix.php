@@ -7,7 +7,7 @@ namespace App\Item\Controller;
 use App\Item\Service\ItemStorage;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Storage\Spec\Compare;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 

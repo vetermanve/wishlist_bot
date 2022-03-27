@@ -4,7 +4,7 @@
 namespace App\Done\Controller;
 
 
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Done extends TelegramExtendedController

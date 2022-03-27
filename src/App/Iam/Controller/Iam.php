@@ -4,7 +4,7 @@
 namespace App\Iam\Controller;
 
 
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Iam extends TelegramExtendedController

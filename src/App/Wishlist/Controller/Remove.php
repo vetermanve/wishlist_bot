@@ -3,7 +3,7 @@
 namespace App\Wishlist\Controller;
 
 use App\Wishlist\Service\WishlistUserStorage;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;

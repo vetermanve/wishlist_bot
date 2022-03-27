@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Run\Channel;
+namespace Verse\Telegram\Run\Channel;
 
 
-use Run\Storage\UserStateStorage;
+use Verse\Telegram\Run\Storage\UserStateStorage;
 use Verse\Run\ChannelMessage\ChannelMsg;
 use Verse\Telegram\Run\Channel\TelegramReplyChannel;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;

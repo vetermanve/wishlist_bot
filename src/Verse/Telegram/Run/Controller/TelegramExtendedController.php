@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Run\Controller;
+namespace Verse\Telegram\Run\Controller;
 
 
-use Run\RequestRouter\ResourceCompiler;
-use Run\RequestRouter\Spec\TelegramRequestRouterState;
+use Verse\Telegram\Run\RequestRouter\ResourceCompiler;
+use Verse\Telegram\Run\RequestRouter\Spec\TelegramRequestRouterState;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Run\Controller\TelegramRunController;
 

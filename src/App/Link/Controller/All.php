@@ -6,7 +6,7 @@ namespace App\Link\Controller;
 
 use App\Link\Service\Links;
 use App\Link\Service\LinkStorage;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Storage\Spec\Compare;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 

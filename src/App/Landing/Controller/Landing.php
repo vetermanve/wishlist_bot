@@ -6,7 +6,7 @@ namespace App\Landing\Controller;
 
 use App\Item\Controller\All;
 use App\Wishlist\Controller\Wishlist;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Landing extends TelegramExtendedController

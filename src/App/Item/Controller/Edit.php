@@ -6,7 +6,7 @@ namespace App\Item\Controller;
 
 use App\Item\Service\ItemStorage;
 use App\Wishlist\Controller\Wishlist;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Run\Util\Uuid;
 use Verse\Storage\Spec\Compare;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;

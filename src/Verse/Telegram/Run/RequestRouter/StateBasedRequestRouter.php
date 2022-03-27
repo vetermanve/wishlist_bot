@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Run\RequestRouter;
+namespace Verse\Telegram\Run\RequestRouter;
 
 
 use Psr\Log\LoggerInterface;
-use Run\RequestRouter\Spec\TelegramRequestRouterState;
+use Verse\Telegram\Run\RequestRouter\Spec\TelegramRequestRouterState;
 use Verse\Di\Env;
 use Verse\Run\RunRequest;
 use Verse\Storage\StorageProto;

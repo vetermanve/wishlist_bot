@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Run\Scheme;
+namespace Verse\Telegram\Run\Scheme;
 
 
-use Run\Channel\SolidStateTelegramResponseChannel;
-use Run\RequestRouter\StateBasedRequestRouter;
-use Run\Storage\UserStateStorage;
+use Verse\Telegram\Run\Channel\SolidStateTelegramResponseChannel;
+use Verse\Telegram\Run\RequestRouter\StateBasedRequestRouter;
+use Verse\Telegram\Run\Storage\UserStateStorage;
 use Service\Routing\TextRouting;
 use Verse\Telegram\Run\Processor\TelegramUpdateProcessor;
 use Verse\Telegram\Run\Scheme\TelegramPullScheme;

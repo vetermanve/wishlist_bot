@@ -9,7 +9,7 @@ use App\Link\Service\LinkStorage;
 use App\Wishlist\Controller\Search;
 use App\Wishlist\Controller\Wishlist;
 use App\Wishlist\Service\WishlistStorage;
-use Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Controller\TelegramExtendedController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Start extends TelegramExtendedController

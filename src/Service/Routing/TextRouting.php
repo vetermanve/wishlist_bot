@@ -9,8 +9,8 @@ use App\Item\Controller\All;
 use App\Item\Controller\Draft;
 use App\Item\Controller\EditMode;
 use App\Wishlist\Controller\Name;
-use Run\RequestRouter\ResourceCompiler;
-use Run\RequestRouter\TextRouterInterface;
+use Verse\Telegram\Run\RequestRouter\ResourceCompiler;
+use Verse\Telegram\Run\RequestRouter\TextRouterInterface;
 use Verse\Run\RunRequest;
 
 class TextRouting implements TextRouterInterface

@@ -9,6 +9,7 @@ use App\Item\Controller\All;
 use App\Item\Controller\EditMode;
 use App\Landing\Controller\Landing;
 use PHPUnit\Framework\TestCase;
+use Verse\Telegram\Run\RequestRouter\ResourceCompiler;
 
 class ResourceCompilerTest extends TestCase
 {

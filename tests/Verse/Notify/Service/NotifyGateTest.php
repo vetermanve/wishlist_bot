@@ -9,6 +9,7 @@ use App\Item\Controller\All;
 use App\Item\Controller\EditMode;
 use App\Landing\Controller\Landing;
 use PHPUnit\Framework\TestCase;
+use Verse\Notify\Sender\AbstractNotifySender;
 use Verse\Notify\Spec\ChannelType;
 use Verse\Notify\Spec\GateChannel;
 use Verse\Telegram\Run\RequestRouter\ResourceCompiler;
@@ -203,6 +204,61 @@ class NotifyGateTest extends TestCase
         $this->assertCount(2, $connections);
 
         $this->assertEquals([$connSMS1, $connSMS2], $connections);
+    }
+
+    public function testSendUserMessage()
+    {
+        $channel = 'test_channel';
+
+        // creating gate
+        $gate = new NotifyGate();
+
+        // adding new sender
+        $sender = new TestSender();
+        $this->assertInstanceOf(AbstractNotifySender::class, $sender);
+        $gate->addSenderForChannel($channel, $sender);
+
+        // adding user channel connection
+        $userId = '456aas';
+        $channelUserId = $userId.'@test.channel';
+        $senderId = 'test_sender@' . $channel;
+
+        $connectionAddResult = $gate->addChannelConnection([
+            GateChannel::USER_ID => $userId, // your system user id
+            GateChannel::CHANNEL_TYPE => $channel,
+            GateChannel::CHANNEL_USER_ID => $channelUserId,
+            GateChannel::KEY => '', // authorisation key if necessary
+            GateChannel::SENDER => $senderId, // binding sender
+            GateChannel::ACTIVE => true, // use this field for channel authorisation state
+            GateChannel::EXPIRE_AT => null // not expiring
+        ]);
+
+        $this->assertTrue($connectionAddResult, 'User Connection written');
+
+        $body = [
+            'text' => 'Blablalba',
+            'buttons' => [
+                '1' => 'nana',
+            ]
+        ];
+
+        $meta = [
+            'page' => 1,
+            'render' => 'blue',
+        ];
+
+        $resSend = $gate->sendUserNotification($userId, $channel, $body, $meta);
+        $this->assertTrue($resSend);
+
+        $testSenderResult = $sender->getLastMessage();
+        $expected = [
+            TestSender::CHANNEL_USER_ID => $channelUserId,
+            TestSender::SENDER_ID => $senderId,
+            TestSender::BODY => $body,
+            TestSender::META => $meta
+        ];
+
+        $this->assertEquals($expected, $testSenderResult);
     }
 
 

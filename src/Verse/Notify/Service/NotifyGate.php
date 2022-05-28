@@ -4,6 +4,7 @@
 namespace Verse\Notify\Service;
 
 
+use Verse\Notify\Sender\AbstractNotifySender;
 use Verse\Notify\Spec\GateChannel;
 use Verse\Notify\Storage\NotifyConnectionsStorage;
 use Verse\Notify\Storage\UserNotifyConnectionsStorage;
@@ -11,6 +12,11 @@ use Verse\Run\Util\Uuid;
 
 class NotifyGate
 {
+    /**
+     * @var AbstractNotifySender[]
+     */
+    protected array $senders = [];
+
     /**
      * @return NotifyConnectionsStorage
      */
@@ -129,5 +135,44 @@ class NotifyGate
         }
 
         return $result;
+    }
+
+    public function sendUserNotification(string $userId, string $channel, array $body, array $meta) : bool
+    {
+        $connections = $this->getUserConnections($userId, $channel, true);
+        $countSent = 0;
+        foreach ($connections as $connection) {
+            $type = $connection[GateChannel::CHANNEL_TYPE];
+            $sender = $this->getSenderForType($type);
+            if ($sender) {
+                $sendResult = $sender->sendMessage(
+                    $connection[GateChannel::CHANNEL_USER_ID],
+                    $connection[GateChannel::SENDER],
+                    $body,
+                    $meta
+                );
+
+                if ($sendResult) {
+                    $countSent++;
+                }
+            }
+        }
+
+        return $countSent > 0;
+    }
+
+    public function getSenderForType(string $channelType) : ?AbstractNotifySender
+    {
+        return $this->senders[$channelType] ?? null;
+    }
+
+    public function addSenderForChannel(string $channelType, TestSender $sender) : bool
+    {
+        if (!is_a($sender, AbstractNotifySender::class)) {
+            return false;
+        }
+
+        $this->senders[$channelType] = $sender;
+        return true;
     }
 }

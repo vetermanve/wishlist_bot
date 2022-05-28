@@ -70,7 +70,7 @@ class NotifySender
         $factory = new RenderFactory();
 
         foreach ($connections as $connection) {
-            $type = $connection[NotifyConnectionsStorage::TYPE];
+            $type = $connection[NotifyConnectionsStorage::CHANNEL_TYPE];
 
 //            $renderer = $this->rederFactory->getRendererByConnectionType($type);
 //            if ($renderer) {

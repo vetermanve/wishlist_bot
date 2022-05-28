@@ -27,12 +27,50 @@ class NotifyGate
         return new UserNotifyConnectionsStorage();
     }
 
-
-    public function addChannel(array $channelParams)
+    public function getUserConnectionId(string $userId, string $channelUserId, string $channelType)
     {
-        $id = Uuid::v4();
-        $channelParams[GateChannel::ID] = $id;
+        return md5($userId . ':' . $channelUserId . ':' . $channelType);
+    }
+
+    public function mapGateChannelToStorage($gateChannel): array
+    {
+        return [
+            NotifyConnectionsStorage::ID => $gateChannel[GateChannel::ID],
+            NotifyConnectionsStorage::USER_ID => $gateChannel[GateChannel::USER_ID],
+            NotifyConnectionsStorage::CHANNEL_USER_ID => $gateChannel[GateChannel::CHANNEL_USER_ID],
+            NotifyConnectionsStorage::CHANNEL_TYPE => $gateChannel[GateChannel::CHANNEL_TYPE],
+            NotifyConnectionsStorage::KEY => $gateChannel[GateChannel::KEY],
+            NotifyConnectionsStorage::SENDER => $gateChannel[GateChannel::SENDER],
+            NotifyConnectionsStorage::IS_ACTIVE => $gateChannel[GateChannel::ACTIVE],
+            NotifyConnectionsStorage::EXPIRE_AT => $gateChannel[GateChannel::EXPIRE_AT],
+        ];
+    }
+
+    public function mapStorageToGateChannel($storageData): array
+    {
+        return [
+            GateChannel::ID => $storageData[NotifyConnectionsStorage::ID],
+            GateChannel::USER_ID => $storageData[NotifyConnectionsStorage::USER_ID],
+            GateChannel::CHANNEL_TYPE => $storageData[NotifyConnectionsStorage::CHANNEL_TYPE],
+            GateChannel::CHANNEL_USER_ID => $storageData[NotifyConnectionsStorage::CHANNEL_USER_ID],
+            GateChannel::KEY => $storageData[NotifyConnectionsStorage::KEY],
+            GateChannel::SENDER => $storageData[NotifyConnectionsStorage::SENDER],
+            GateChannel::ACTIVE => $storageData[NotifyConnectionsStorage::IS_ACTIVE],
+            GateChannel::EXPIRE_AT => $storageData[NotifyConnectionsStorage::EXPIRE_AT],
+        ];
+    }
+
+    public function addChannelConnection(array $channelParams)
+    {
         $userId = $channelParams[GateChannel::USER_ID];
+
+        $id = $this->getUserConnectionId(
+            $channelParams[GateChannel::USER_ID],
+            $channelParams[GateChannel::CHANNEL_USER_ID],
+            $channelParams[GateChannel::CHANNEL_TYPE],
+        );
+
+        $channelParams[GateChannel::ID] = $id;
 
         $connectionsStorage = $this->getConnectionsStorage();
         $userConnectionsStorage = $this->getUserConnectionsMapStorage();
@@ -57,26 +95,39 @@ class NotifyGate
         return !empty($connectionBindWriteRes);
     }
 
-    public function mapGateChannelToStorage($gateChannel)
+    public function checkUserHasConnection(string $userId, string $channelUserId, string $channelType): bool
     {
-        /*
-        GateChannel::CONNECTION => ConnectionTypes::VERSE_WS_NODE, // user terminal session
-        GateChannel::USER_ID => $userId, // your system user id
-        GateChannel::CHANNEL_ID => 'pid@host',
-        GateChannel::KEY => '', // authorisation key if necessary
-        GateChannel::SENDER => 'wishlist_app', // binding sender
-        GateChannel::ACTIVE => true, // are user online?
-        GateChannel::EXPIRE_AT => time() + 6400 // should have connection recheck after expiration
-         * */
+        $connectionId = $this->getUserConnectionId($userId, $channelUserId, $channelType);
+        $connection = $this->getConnectionsStorage()->read()->get($connectionId, __METHOD__);
+        return !empty($connection);
+    }
 
-        return [
-            NotifyConnectionsStorage::ID => $gateChannel[GateChannel::ID],
-            NotifyConnectionsStorage::USER_ID => $gateChannel[GateChannel::USER_ID],
-            NotifyConnectionsStorage::CHANNEL_ID => $gateChannel[GateChannel::CHANNEL_ID],
-            NotifyConnectionsStorage::KEY => $gateChannel[GateChannel::KEY],
-            NotifyConnectionsStorage::SENDER => $gateChannel[GateChannel::SENDER],
-            NotifyConnectionsStorage::IS_ACTIVE => $gateChannel[GateChannel::ACTIVE],
-            NotifyConnectionsStorage::EXPIRE_AT => $gateChannel[GateChannel::EXPIRE_AT],
-        ];
+    public function getUserConnections($userId, string $channelType, $onlyActive = false): array
+    {
+        $userConnections = $this->getUserConnectionsMapStorage()->read()->get($userId, __METHOD__);
+        if (!$userConnections) {
+            return [];
+        }
+
+        $ids = $userConnections[UserNotifyConnectionsStorage::CONNECTIONS];
+        if (!$ids) {
+            return [];
+        }
+
+        $connections = $this->getConnectionsStorage()->read()->mGet($ids, __METHOD__);
+        if (!$connections) {
+            return [];
+        }
+
+        $result = [];
+
+        foreach ($connections as $key => $connection) {
+            if ($connection[NotifyConnectionsStorage::CHANNEL_TYPE] == $channelType
+                    && (!$onlyActive || $connection[NotifyConnectionsStorage::IS_ACTIVE] === true)) {
+                $result[] = $this->mapStorageToGateChannel($connection);
+            }
+        }
+
+        return $result;
     }
 }

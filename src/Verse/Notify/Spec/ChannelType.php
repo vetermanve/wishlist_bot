@@ -4,7 +4,7 @@
 namespace Verse\Notify\Spec;
 
 
-class ConnectionTypes
+class ChannelType
 {
     public const TELEGRAM = 'tg';
     public const EMAIL = 'email';

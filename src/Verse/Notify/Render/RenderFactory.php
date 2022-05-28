@@ -4,15 +4,15 @@
 namespace Verse\Notify\Render;
 
 
-use Verse\Notify\Spec\ConnectionTypes;
+use Verse\Notify\Spec\ChannelType;
 
 class RenderFactory
 {
     private $map = [
-        ConnectionTypes::TELEGRAM => TelegramRenderer::class
+        ChannelType::TELEGRAM => TelegramRenderer::class
     ];
 
-    public function getRendererByConnectionType($type) : NotifyRenderAbstract {
+    public function getRendererByConnectionType($type) : ?NotifyRenderAbstract {
         if (isset($this->map[$type])) {
             return new $this->map[$type];
         }

@@ -19,21 +19,16 @@ class NotifyConnectionsStorage extends SimpleStorage
 
     /**
      * Ids of connected devices
-     * @link ConnectionTypes
+     * @link ChannelType
      */
-    const TYPE = 'type';
-
-    /**
-     * string
-     */
-    const EXT_ID = 'ext_id';
+    const CHANNEL_TYPE = 'type';
 
     /**
      * string
      */
     const KEY = 'key';
     const USER_ID = 'uid';
-    const CHANNEL_ID = 'ch_id';
+    const CHANNEL_USER_ID = 'ch_uid';
     const SENDER = 'sndr';
     const IS_ACTIVE = 'is_a';
     const EXPIRE_AT = 'exp';

@@ -19,11 +19,14 @@ class SolidStateTelegramResponseChannel extends TelegramReplyChannel
     public function send(ChannelMsg $msg)
     {
         $result = parent::send($msg);
+
         if ($result && $this->stateStorage) {
             $route = new MessageRoute($msg->getDestination());
             $data = (array)$msg->getChannelState()->pack(true);
             $this->stateStorage->write()->update($route->getChatId(), $data, __METHOD__);
         }
+
+        return $result;
     }
 
     /**

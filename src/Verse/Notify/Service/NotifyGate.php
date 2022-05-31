@@ -8,19 +8,23 @@ use Verse\Notify\Sender\AbstractNotifySender;
 use Verse\Notify\Spec\GateChannel;
 use Verse\Notify\Storage\NotifyConnectionsStorage;
 use Verse\Notify\Storage\UserNotifyConnectionsStorage;
+use Verse\Run\Channel\DataChannelProto;
+use Verse\Run\ChannelMessage\ChannelMsg;
+use Verse\Run\Component\RunComponentProto;
 use Verse\Run\Util\Uuid;
+use Verse\Storage\StorageProto;
 
 class NotifyGate
 {
     /**
-     * @var AbstractNotifySender[]
+     * @var DataChannelProto[]
      */
-    protected array $senders = [];
+    protected array $channelsByType = [];
 
     /**
      * @return NotifyConnectionsStorage
      */
-    public function getConnectionsStorage()
+    public function getConnectionsStorage(): StorageProto
     {
         return new NotifyConnectionsStorage();
     }
@@ -28,17 +32,17 @@ class NotifyGate
     /**
      * @return UserNotifyConnectionsStorage
      */
-    public function getUserConnectionsMapStorage()
+    public function getUserConnectionsMapStorage(): StorageProto
     {
         return new UserNotifyConnectionsStorage();
     }
 
-    public function getUserConnectionId(string $userId, string $channelUserId, string $channelType)
+    public function getUserConnectionId(string $userId, string $channelUserId, string $channelType): string
     {
         return md5($userId . ':' . $channelUserId . ':' . $channelType);
     }
 
-    public function mapGateChannelToStorage($gateChannel): array
+    protected function mapGateChannelToStorage($gateChannel): array
     {
         return [
             NotifyConnectionsStorage::ID => $gateChannel[GateChannel::ID],
@@ -52,7 +56,7 @@ class NotifyGate
         ];
     }
 
-    public function mapStorageToGateChannel($storageData): array
+    protected function mapStorageToGateChannel($storageData): array
     {
         return [
             GateChannel::ID => $storageData[NotifyConnectionsStorage::ID],
@@ -137,20 +141,28 @@ class NotifyGate
         return $result;
     }
 
-    public function sendUserNotification(string $userId, string $channel, array $body, array $meta) : bool
+    public function sendUserNotification(string $userId, string $channelType, array $body, array $meta) : bool
     {
-        $connections = $this->getUserConnections($userId, $channel, true);
+        $connections = $this->getUserConnections($userId, $channelType, true);
         $countSent = 0;
+
         foreach ($connections as $connection) {
             $type = $connection[GateChannel::CHANNEL_TYPE];
-            $sender = $this->getSenderForType($type);
-            if ($sender) {
-                $sendResult = $sender->sendMessage(
-                    $connection[GateChannel::CHANNEL_USER_ID],
-                    $connection[GateChannel::SENDER],
-                    $body,
-                    $meta
-                );
+            $channel = $this->getChannelForType($type);
+
+            if ($channel) {
+                $msgId = Uuid::v4();
+
+                $msg = new ChannelMsg();
+                $msg->setUid($msgId);
+                $msg->setBody($body);
+                $msg->setDestination($connection[GateChannel::CHANNEL_USER_ID]);
+
+                foreach ($meta as $metaKey => $metaVal) {
+                    $msg->setMeta($metaKey, $metaVal);
+                }
+
+                $sendResult = $channel->send($msg);
 
                 if ($sendResult) {
                     $countSent++;
@@ -161,18 +173,13 @@ class NotifyGate
         return $countSent > 0;
     }
 
-    public function getSenderForType(string $channelType) : ?AbstractNotifySender
+    public function getChannelForType(string $channelType) : ?DataChannelProto
     {
-        return $this->senders[$channelType] ?? null;
+        return $this->channelsByType[$channelType] ?? null;
     }
 
-    public function addSenderForChannel(string $channelType, TestSender $sender) : bool
+    public function addChannelForType(string $channelType, DataChannelProto $channel) : void
     {
-        if (!is_a($sender, AbstractNotifySender::class)) {
-            return false;
-        }
-
-        $this->senders[$channelType] = $sender;
-        return true;
+        $this->channelsByType[$channelType] = $channel;
     }
 }

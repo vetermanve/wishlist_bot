@@ -5,6 +5,7 @@ namespace Verse\Telegram\Run\Scheme;
 
 
 use Verse\Telegram\Run\Channel\SolidStateTelegramResponseChannel;
+use Verse\Telegram\Run\Component\SetupTelegramNotifyGate;
 use Verse\Telegram\Run\RequestRouter\StateBasedRequestRouter;
 use Verse\Telegram\Run\Storage\UserStateStorage;
 use Service\Routing\TextRouting;
@@ -15,20 +16,39 @@ class TelegramPullExtendedScheme extends TelegramPullScheme
 {
     public function configure()
     {
+        // configure state storage
         $stateStorage = new UserStateStorage();
 
+        // configure telegram channel
+        $channel = new SolidStateTelegramResponseChannel();
+        $channel->setStateStorage($stateStorage);
+
+        // bind telegram channel to core
+        $this->core->setDataChannel($channel);
+
+        // configure notification gate bootstrap
+        $notificationGateLoader = new SetupTelegramNotifyGate();
+        $notificationGateLoader->setTelegramChannel($channel);
+
+        // add component to be booted
+        $this->addComponent($notificationGateLoader);
+
+        // configure processor
         $processor = new TelegramUpdateProcessor();
+
+        // configure router
         $router = new StateBasedRequestRouter();
         $router->setTextRouter(new TextRouting());
         $router->setStateStorage($stateStorage);
 
+        // bind router to processor
         $processor->setRequestRouter($router);
+        //bind processor to scheme
         $this->processor = $processor;
+
+        // proceed with parent configuration
         parent::configure();
 
-        $channel = new SolidStateTelegramResponseChannel();
-        $channel->setStateStorage($stateStorage);
 
-        $this->core->setDataChannel($channel);
     }
 }

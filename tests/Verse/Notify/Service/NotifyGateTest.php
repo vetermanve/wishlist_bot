@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 use Verse\Notify\Sender\AbstractNotifySender;
 use Verse\Notify\Spec\ChannelType;
 use Verse\Notify\Spec\GateChannel;
+use Verse\Run\Channel\DataChannelProto;
+use Verse\Run\Channel\MemoryStoreChannel;
 use Verse\Telegram\Run\RequestRouter\ResourceCompiler;
 
 class NotifyGateTest extends TestCase
@@ -20,8 +22,10 @@ class NotifyGateTest extends TestCase
     {
         $path = explode(DIRECTORY_SEPARATOR, getcwd());
         $key = array_search('tests', $path);
-        $path = array_slice($path, 0, $key+1);
-        chdir(implode(DIRECTORY_SEPARATOR, $path));
+        if ($key) {
+            $path = array_slice($path, 0, $key+1);
+            chdir(implode(DIRECTORY_SEPARATOR, $path));
+        }
 
         parent::setUpBeforeClass();
     }
@@ -208,27 +212,28 @@ class NotifyGateTest extends TestCase
 
     public function testSendUserMessage()
     {
-        $channel = 'test_channel';
+        $channelType = 'test_channel';
 
         // creating gate
         $gate = new NotifyGate();
 
-        // adding new sender
-        $sender = new TestSender();
-        $this->assertInstanceOf(AbstractNotifySender::class, $sender);
-        $gate->addSenderForChannel($channel, $sender);
+        // adding new channel
+        $channel = new MemoryStoreChannel();
+
+        $this->assertInstanceOf(DataChannelProto::class, $channel);
+        $gate->addChannelForType($channelType, $channel);
 
         // adding user channel connection
         $userId = '456aas';
-        $channelUserId = $userId.'@test.channel';
-        $senderId = 'test_sender@' . $channel;
+        $channelUserId = $userId.'@'.$channelType;
+        $senderId = 'test_sender@' . $channelType;
 
         $connectionAddResult = $gate->addChannelConnection([
             GateChannel::USER_ID => $userId, // your system user id
-            GateChannel::CHANNEL_TYPE => $channel,
+            GateChannel::CHANNEL_TYPE => $channelType,
             GateChannel::CHANNEL_USER_ID => $channelUserId,
             GateChannel::KEY => '', // authorisation key if necessary
-            GateChannel::SENDER => $senderId, // binding sender
+            GateChannel::SENDER => $senderId, // binding channel
             GateChannel::ACTIVE => true, // use this field for channel authorisation state
             GateChannel::EXPIRE_AT => null // not expiring
         ]);
@@ -247,18 +252,23 @@ class NotifyGateTest extends TestCase
             'render' => 'blue',
         ];
 
-        $resSend = $gate->sendUserNotification($userId, $channel, $body, $meta);
-        $this->assertTrue($resSend);
+        $resSend = $gate->sendUserNotification($userId, $channelType, $body, $meta);
+        $resultedMessage =  $channel->getMessage();
+        $this->assertNotEmpty($resultedMessage);
 
-        $testSenderResult = $sender->getLastMessage();
         $expected = [
             TestSender::CHANNEL_USER_ID => $channelUserId,
-            TestSender::SENDER_ID => $senderId,
             TestSender::BODY => $body,
             TestSender::META => $meta
         ];
 
-        $this->assertEquals($expected, $testSenderResult);
+        $result = [
+            TestSender::CHANNEL_USER_ID => $resultedMessage->getDestination(),
+            TestSender::BODY => $resultedMessage->getBody(),
+            TestSender::META => $resultedMessage->getAllMeta()
+        ];
+
+        $this->assertEquals($expected, $result);
     }
 
 

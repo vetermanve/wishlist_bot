@@ -113,3 +113,42 @@ $writeResult = $gate->addChannelConnection([
 
 $connections = $gate->getUserConnections($userId, ChannelType::TELEGRAM);
 ```
+
+# Step 4 - Send notification to user
+
+```php
+use Verse\Notify\Service\NotifyGate;
+use Verse\Notify\Spec\ChannelType;
+use Verse\Notify\Spec\GateChannel;
+
+$gate = new NotifyGate();
+
+$userId = 123; // some your user id;
+$senderId = 'test_sender@someservice.com';
+
+$connectionAddResult = $gate->addChannelConnection([
+    GateChannel::USER_ID => $userId, // your system user id
+    GateChannel::CHANNEL_TYPE => ChannelType::EMAIL,
+    GateChannel::CHANNEL_USER_ID => 'superman@test.mail',
+    GateChannel::KEY => '', // authorisation key if necessary
+    GateChannel::SENDER => $senderId, // binding sender
+    GateChannel::ACTIVE => true, // use this field for channel authorisation state
+    GateChannel::EXPIRE_AT => null // not expiring
+]);
+
+$this->assertTrue($connectionAddResult, 'User Connection written');
+
+$body = [
+    'text' => 'Blablalba',
+    'buttons' => [
+        '1' => 'nana',
+    ]
+];
+
+$meta = [
+    'page' => 1,
+    'render' => 'blue',
+];
+
+$isNotificationSent = $gate->sendUserNotification($userId, ChannelType::EMAIL, $body, $meta);
+```

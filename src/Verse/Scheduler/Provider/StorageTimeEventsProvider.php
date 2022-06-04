@@ -32,6 +32,11 @@ class StorageTimeEventsProvider extends RequestProviderProto
     private bool $shouldProceed = true;
 
     /**
+     * @var int Shifting time for test reasons or special purpose
+     */
+    private int $timeShift = 0;
+
+    /**
      * @var ?Closure
      */
     private ?Closure $shouldProceedCallback;
@@ -50,13 +55,15 @@ class StorageTimeEventsProvider extends RequestProviderProto
     public function run()
     {
         while (call_user_func($this->shouldProceedCallback)) {
-            $start = time();;
-            $endingTime = time();
-            $this->runBlock($endingTime, 30);
-            $endingTime -= 30;
-            $this->runBlock($endingTime, 300);
-            $endingTime -= 300;
-            $this->runBlock($endingTime, 3000);
+            $start = time() + $this->timeShift;
+            $endingTime = $start;
+            $blockSizes = [30, 300, 3000];
+
+            foreach ($blockSizes as $blockSize) {
+                $this->runBlock($endingTime, $blockSize);
+                $endingTime -= $blockSize;
+            }
+
             $timeToNextSecond = $start + 1 - microtime(1);
             if ($timeToNextSecond > 0) {
                usleep(
@@ -71,23 +78,27 @@ class StorageTimeEventsProvider extends RequestProviderProto
         $timeIds = $this->getTimeRange($end, $size);
         $eventsBySlots = $this->timeSlotStorage->read()->mGet($timeIds, __METHOD__);
         $eventsBySlots = array_filter($eventsBySlots);
-        shuffle($eventsBySlots);
 
-        foreach ($eventsBySlots as $eventsBySlot) {
-            $events = $this->eventStorage->read()->mGet($eventsBySlot[TimeSlotStorage::EVENT_IDS], __METHOD__);
+        foreach ($eventsBySlots as $timeSlotRecord) {
+            $events = $this->eventStorage->read()->mGet($timeSlotRecord[TimeSlotStorage::EVENT_IDS], __METHOD__);
 
             foreach ($events as $index => $event) {
-                $this->runEvent($event);
+                if ($event) {
+                    $this->runEvent($event);
+                    $this->eventStorage->write()->remove($event[EventsStorage::ID], __METHOD__);
+                } else {
+                    $this->runtime->warning('Event found in list, but not found in storage', ['event_id' => $index, 'slot' => $timeSlotRecord[TimeSlotStorage::ID],]);
+                }
             }
 
-            $this->timeSlotStorage->write()->remove($eventsBySlot[TimeSlotStorage::ID], __METHOD__);
+            $this->timeSlotStorage->write()->remove($timeSlotRecord[TimeSlotStorage::ID], __METHOD__);
         }
     }
 
-    public function getTimeRange($endTime, $step = 30)
+    public function getTimeRange($endTime, $size)
     {
-        $time = time();
-        return range($time - 30 - $this->partition , $time, $this->partitionsCount);
+        $start = $endTime - $this->partition;
+        return range($start - $size, $start, $this->partitionsCount);
     }
 
     private function runEvent($event)
@@ -126,6 +137,22 @@ class StorageTimeEventsProvider extends RequestProviderProto
     public function setShouldProceedCallback(?Closure $shouldProceedCallback): void
     {
         $this->shouldProceedCallback = $shouldProceedCallback;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeShift(): int
+    {
+        return $this->timeShift;
+    }
+
+    /**
+     * @param int $timeShift
+     */
+    public function setTimeShift(int $timeShift): void
+    {
+        $this->timeShift = $timeShift;
     }
 
 }

@@ -142,4 +142,53 @@ class TimeEventSchedulerServiceTest extends TestCase
         $this->assertEquals($data, $req->data);
         $this->assertEquals($user, $req->getParamOrData('from', )['user_id']);
     }
+
+    public function testStorageTimeEventProviderWriteAndReadSeveralEvents()
+    {
+        $core = new RunCore();
+        $context = new RunContext();
+        $runtime = new RuntimeLog();
+        $core->setContext($context);
+        $core->setRuntime($runtime);
+
+        $provider = new StorageTimeEventsProvider();
+        $a = new \stdClass();
+        $a->loops = 3;
+
+        $provider->setShouldProceedCallback(function () use ($a) {
+            return --$a->loops > 0;
+        });
+
+        $core->setProvider($provider);
+
+        $processor = new MockProcessor();
+        $core->setProcessor($processor);
+
+        $core->configure();
+        $core->prepare();
+
+        $service = new TimeEventScheduler();
+
+        $createEventsCount = 3;
+        $startTime = time();
+        for ($i = 0; $i < $createEventsCount; $i++) {
+            $time = $startTime - 10 + $i;
+            $route = '/test_resource';
+            $data = ['data' => 'borodata', 'time' => microtime(1), ];
+            $user = 'agent007:'.crc32(microtime(1));
+            $ttl = 3600;
+            $result = $service->addEvent($user, $time, $route, $data, $ttl);
+            $this->assertTrue($result);
+        }
+
+        $core->run();
+
+        $this->assertEquals(0, $a->loops);
+        $req = $processor->getLastRequest();
+
+        $this->assertEquals($route, $req->getResource());
+        $this->assertEquals($data, $req->data);
+        $this->assertEquals($user, $req->getParamOrData('from', )['user_id']);
+        $this->assertCount($createEventsCount, $processor->getAllRequests());
+    }
 }

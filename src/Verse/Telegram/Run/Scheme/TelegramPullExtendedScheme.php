@@ -8,6 +8,7 @@ use Verse\Run\Component\CreateDependencyContainer;
 use Verse\Run\Component\UnexpectedShutdownHandler;
 use Verse\Telegram\Run\Channel\SolidStateTelegramResponseChannel;
 use Verse\Telegram\Run\Channel\TelegramReplyChannel;
+use Verse\Telegram\Run\Component\RuntimeLoggerBinder;
 use Verse\Telegram\Run\Component\SetupTelegramNotifyGate;
 use Verse\Telegram\Run\RequestRouter\StateBasedRequestRouter;
 use Verse\Telegram\Run\Storage\UserStateStorage;
@@ -35,6 +36,7 @@ class TelegramPullExtendedScheme extends TelegramPullScheme
 
         // add component to be booted
         $this->addComponent($notificationGateLoader);
+        $this->addComponent(new RuntimeLoggerBinder());
 
         // configure processor
         $processor = new TelegramUpdateProcessor();

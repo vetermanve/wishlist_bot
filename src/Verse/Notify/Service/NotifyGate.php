@@ -11,6 +11,7 @@ use Verse\Notify\Storage\UserNotifyConnectionsStorage;
 use Verse\Run\Channel\DataChannelProto;
 use Verse\Run\ChannelMessage\ChannelMsg;
 use Verse\Run\Component\RunComponentProto;
+use Verse\Run\Util\ChannelState;
 use Verse\Run\Util\Uuid;
 use Verse\Storage\StorageProto;
 
@@ -146,6 +147,8 @@ class NotifyGate
         $connections = $this->getUserConnections($userId, $channelType, true);
         $countSent = 0;
 
+        $channelState = new ChannelState();
+
         foreach ($connections as $connection) {
             $type = $connection[GateChannel::CHANNEL_TYPE];
             $channel = $this->getChannelForType($type);
@@ -154,6 +157,7 @@ class NotifyGate
                 $msgId = Uuid::v4();
 
                 $msg = new ChannelMsg();
+                $msg->setChannelState($channelState);
                 $msg->setUid($msgId);
                 $msg->setBody($body);
                 $msg->setDestination($connection[GateChannel::CHANNEL_USER_ID]);

@@ -18,9 +18,11 @@ class SetupTelegramNotifyGate extends RunComponentProto
     public function run()
     {
         $telegramChannel = $this->telegramChannel;
+        $telegramChannel->follow($this);
 
         Env::getContainer()->setModule(NotifyGate::class, function () use ($telegramChannel) {
             $gate = new NotifyGate();
+            $telegramChannel->prepare();
             $gate->addChannelForType(ChannelType::TELEGRAM, $telegramChannel);
             return $gate;
         });

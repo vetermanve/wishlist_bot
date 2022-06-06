@@ -54,6 +54,8 @@ class StorageTimeEventsProvider extends RequestProviderProto
 
     public function run()
     {
+        $this->runtime->info(__CLASS__.' started');
+
         while (call_user_func($this->shouldProceedCallback)) {
             $start = time() + $this->timeShift;
             $endingTime = $start;

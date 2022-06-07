@@ -4,8 +4,11 @@
 namespace Verse\Notify\Service;
 
 
+use Psr\Log\LoggerInterface;
+use Verse\Di\Env;
 use Verse\Notify\Sender\AbstractNotifySender;
 use Verse\Notify\Spec\GateChannel;
+use Verse\Notify\Spec\Message;
 use Verse\Notify\Storage\NotifyConnectionsStorage;
 use Verse\Notify\Storage\UserNotifyConnectionsStorage;
 use Verse\Run\Channel\DataChannelProto;
@@ -13,6 +16,7 @@ use Verse\Run\ChannelMessage\ChannelMsg;
 use Verse\Run\Component\RunComponentProto;
 use Verse\Run\Util\ChannelState;
 use Verse\Run\Util\Uuid;
+use Verse\Scheduler\Service\TimeEventScheduler;
 use Verse\Storage\StorageProto;
 
 class NotifyGate
@@ -21,6 +25,8 @@ class NotifyGate
      * @var DataChannelProto[]
      */
     protected array $channelsByType = [];
+
+    protected TimeEventScheduler $scheduler;
 
     /**
      * @return NotifyConnectionsStorage
@@ -36,6 +42,14 @@ class NotifyGate
     public function getUserConnectionsMapStorage(): StorageProto
     {
         return new UserNotifyConnectionsStorage();
+    }
+
+    public function getScheduler() : TimeEventScheduler
+    {
+        if (!isset($this->scheduler)) {
+            $this->scheduler = new TimeEventScheduler();
+        }
+        return $this->scheduler;
     }
 
     public function getUserConnectionId(string $userId, string $channelUserId, string $channelType): string
@@ -142,6 +156,38 @@ class NotifyGate
         return $result;
     }
 
+    public function scheduleUserNotification(int $delay, string $userId, string $channelType, array $body, array $meta) : bool
+    {
+        $time = time() + $delay;
+
+        $message = [
+            Message::TIME => $time,
+            Message::USER_ID => $userId,
+            Message::CHANNEL => $channelType,
+            Message::BODY => $body,
+            Message::META => $meta,
+        ];
+
+        try {
+            return $this->getScheduler()->addEvent(
+                $userId,
+                $time,
+                '/notify/send',
+                $message
+            );
+        } catch (\Throwable $exception) {
+            /** @var LoggerInterface $logger */
+            $logger = Env::getContainer()->bootstrap(LoggerInterface::class, false);
+            if ($logger) {
+                $logger->error($exception->getMessage(), [
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine(),
+                ]);
+            }
+            return false;
+        }
+    }
+
     public function sendUserNotification(string $userId, string $channelType, array $body, array $meta) : bool
     {
         $connections = $this->getUserConnections($userId, $channelType, true);
@@ -185,5 +231,13 @@ class NotifyGate
     public function addChannelForType(string $channelType, DataChannelProto $channel) : void
     {
         $this->channelsByType[$channelType] = $channel;
+    }
+
+    /**
+     * @param TimeEventScheduler $scheduler
+     */
+    public function setScheduler(TimeEventScheduler $scheduler): void
+    {
+        $this->scheduler = $scheduler;
     }
 }

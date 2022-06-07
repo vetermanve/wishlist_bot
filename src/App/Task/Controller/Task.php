@@ -44,7 +44,11 @@ class Task extends TelegramExtendedController
             $connectionCreated = $gate->addChannelConnection($telegramConnectionData);
         }
 
-        $notificationSent = $gate->sendUserNotification($userId, ChannelType::TELEGRAM, [
+//        $notificationSent = $gate->sendUserNotification($userId, ChannelType::TELEGRAM, [
+//            'text' => "helloo!",
+//        ], []);
+
+        $notificationSent = $gate->scheduleUserNotification(0, $userId, ChannelType::TELEGRAM, [
             'text' => "helloo!",
         ], []);
 

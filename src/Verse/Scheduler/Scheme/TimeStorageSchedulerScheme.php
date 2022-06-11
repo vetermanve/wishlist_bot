@@ -4,6 +4,9 @@
 namespace Verse\Scheduler\Scheme;
 
 
+use Verse\Notify\Component\SetupNotifyChannels;
+use Verse\Notify\Component\SetupNotifyGate;
+use Verse\Notify\Spec\ChannelType;
 use Verse\Run\Component\CreateDependencyContainer;
 use Verse\Run\Component\UnexpectedShutdownHandler;
 use Verse\Run\Processor\SimpleRestProcessor;
@@ -33,14 +36,12 @@ class TimeStorageSchedulerScheme extends PreconfiguredSchemaProto
             return time() - $loopData->startTime < $loopData->workTime;
         });
 
-        $telegramChannel = new TelegramReplyChannel();
-
         // configure notification gate bootstrap
-        $notificationGateLoader = new SetupTelegramNotifyGate();
-        $notificationGateLoader->setTelegramChannel($telegramChannel);
+        $this->core->addComponent(new SetupNotifyGate());
 
-        // add component to be booted
-        $this->core->addComponent($notificationGateLoader);
+        $notificationChannelLoader = new SetupNotifyChannels();
+        $notificationChannelLoader->addChannel(ChannelType::TELEGRAM, new TelegramReplyChannel());
+        $this->core->addComponent($notificationChannelLoader);
 
         //bind processor to scheme
         $this->processor = new SimpleRestProcessor();

@@ -171,8 +171,8 @@ class TimeEventSchedulerServiceTest extends TestCase
 
         $createEventsCount = 3;
         $startTime = time();
-        for ($i = 0; $i < $createEventsCount; $i++) {
-            $time = $startTime - 10 + $i;
+        for ($i = $createEventsCount - 1; $i >= 0 ; $i--) {
+            $time = $startTime - 10*$i;
             $route = '/test_resource';
             $data = ['data' => 'borodata', 'time' => microtime(1), ];
             $user = 'agent007:'.crc32(microtime(1));

@@ -40,6 +40,7 @@ class StorageTimeEventsProvider extends RequestProviderProto
      * @var ?Closure
      */
     private ?Closure $shouldProceedCallback;
+    private int $slotDeletionSafePeriod = 3;
 
     public function prepare()
     {
@@ -54,7 +55,7 @@ class StorageTimeEventsProvider extends RequestProviderProto
 
     public function run()
     {
-        $this->runtime->info(__CLASS__.' started');
+        $this->runtime->info(__CLASS__ . ' started');
 
         while (call_user_func($this->shouldProceedCallback)) {
             $start = time() + $this->timeShift;
@@ -68,15 +69,16 @@ class StorageTimeEventsProvider extends RequestProviderProto
 
             $timeToNextSecond = $start + 1 - microtime(1);
             if ($timeToNextSecond > 0) {
-               usleep(
-                   floor($timeToNextSecond*1000)
-               );
+                usleep(
+                    floor($timeToNextSecond * 1000000)
+                );
             }
         };
     }
 
     public function runBlock($end, $size)
     {
+        $startTime = time();
         $timeIds = $this->getTimeRange($end, $size);
         $eventsBySlots = $this->timeSlotStorage->read()->mGet($timeIds, __METHOD__);
         $eventsBySlots = array_filter($eventsBySlots);
@@ -89,11 +91,13 @@ class StorageTimeEventsProvider extends RequestProviderProto
                     $this->runEvent($event);
                     $this->eventStorage->write()->remove($event[EventsStorage::ID], __METHOD__);
                 } else {
-                    $this->runtime->warning('Event found in list, but not found in storage', ['event_id' => $index, 'slot' => $timeSlotRecord[TimeSlotStorage::ID],]);
+//                    $this->runtime->debug('Event found in list, but not found in storage', ['event_id' => $index, 'slot' => $timeSlotRecord[TimeSlotStorage::ID],]);
                 }
             }
 
-            $this->timeSlotStorage->write()->remove($timeSlotRecord[TimeSlotStorage::ID], __METHOD__);
+            if ($startTime - $timeSlotRecord[TimeSlotStorage::ID] > $this->slotDeletionSafePeriod) { // slot more than n seconds old
+                $this->timeSlotStorage->write()->remove($timeSlotRecord[TimeSlotStorage::ID], __METHOD__);
+            }
         }
     }
 
@@ -107,7 +111,7 @@ class StorageTimeEventsProvider extends RequestProviderProto
     {
         if (isset($event[EventsStorage::TTL]) && $event[EventsStorage::TTL] > 0 // ttl was set
             && ($event[EventsStorage::TIME] + $event[EventsStorage::TTL] < time())) { // and ttl expired
-                return false;
+            return false;
         }
 
         $req = new RunRequest($event[EventsStorage::ID], $event[EventsStorage::ROUTE]);
@@ -155,6 +159,22 @@ class StorageTimeEventsProvider extends RequestProviderProto
     public function setTimeShift(int $timeShift): void
     {
         $this->timeShift = $timeShift;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSlotDeletionSafePeriod(): int
+    {
+        return $this->slotDeletionSafePeriod;
+    }
+
+    /**
+     * @param int $slotDeletionSafePeriod
+     */
+    public function setSlotDeletionSafePeriod(int $slotDeletionSafePeriod): void
+    {
+        $this->slotDeletionSafePeriod = $slotDeletionSafePeriod;
     }
 
 }

@@ -6,14 +6,12 @@ namespace Verse\Notify\Service;
 
 use Psr\Log\LoggerInterface;
 use Verse\Di\Env;
-use Verse\Notify\Sender\AbstractNotifySender;
 use Verse\Notify\Spec\GateChannel;
 use Verse\Notify\Spec\Message;
 use Verse\Notify\Storage\NotifyConnectionsStorage;
 use Verse\Notify\Storage\UserNotifyConnectionsStorage;
 use Verse\Run\Channel\DataChannelProto;
 use Verse\Run\ChannelMessage\ChannelMsg;
-use Verse\Run\Component\RunComponentProto;
 use Verse\Run\Util\ChannelState;
 use Verse\Run\Util\Uuid;
 use Verse\Scheduler\Service\TimeEventScheduler;

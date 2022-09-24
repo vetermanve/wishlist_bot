@@ -25,7 +25,7 @@ class Create extends TelegramExtendedController {
 
         if ($listId) {
             $listData = $wishlistStorage->read()->get($listId, __METHOD__);
-            if($listData && isset($listData[WishlistStorage::NAME]) && $listData[WishlistStorage::NAME] !== '') {
+            if ($listData && isset($listData[WishlistStorage::NAME]) && $listData[WishlistStorage::NAME] !== '') {
                 $text = 'Твой вишлист: '.$listData[WishlistStorage::NAME];
                 return $this->textResponse($text)
                     ->addKeyboardKey('Переименовать', '/wishlist_name',

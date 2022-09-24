@@ -1,6 +1,7 @@
 <?php
 
 chdir(__DIR__);
+ini_set('display_errors', E_ALL ^ E_DEPRECATED);
 require_once "vendor/autoload.php";
 
 // load env

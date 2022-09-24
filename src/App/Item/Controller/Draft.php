@@ -23,7 +23,7 @@ class Draft extends TelegramExtendedController
 
         if (!$text) {
             return $this->textResponse('Что ты хочешь? Напиши!')
-                ->addKeyboardKey('Пока не хочу', '/done', MessageRoute::APPEAR_CALLBACK_ANSWER);
+                ->addKeyboardKey('Пока не хочу', '/done', [], MessageRoute::APPEAR_CALLBACK_ANSWER);
         }
 
         if (mb_eregi('ничего|закончил|хватит', $text) !== false) {
@@ -75,7 +75,7 @@ class Draft extends TelegramExtendedController
 
         $text = "Я записал, что ты хочешь: $text\n";
         if (!empty($listData)) {
-            if (!is_array($listData[WishlistStorage::ITEMS])) {
+            if (!isset($listData[WishlistStorage::ITEMS]) || !is_array($listData[WishlistStorage::ITEMS])) {
                 $listData[WishlistStorage::ITEMS] = [];
             }
 

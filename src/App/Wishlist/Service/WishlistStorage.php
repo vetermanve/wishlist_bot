@@ -12,7 +12,7 @@ use Verse\Storage\StorageDependency;
 
 class WishlistStorage extends SimpleStorage
 {
-
+    const ID = "id";
     const NAME = "n";
     const ITEMS = "items";
     const LINKS = "links";

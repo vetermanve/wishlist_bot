@@ -40,15 +40,13 @@ class Start extends TelegramExtendedController
             }
         }
 
-        $text = "Привет! \nЗдесь ты можешь создать свой вишлист и подписываться на вишлисты друзей!\n"
-            . "Список доступных комманд\n";
+        $text = "Привет! \nЗдесь ты можешь";
 
         $response = $this->textResponse($text);
         $response
 //            ->addKeyboardKey('Добавить желание', $this->r(Draft::class))
-            ->addKeyboardKey('Посмотреть все желания', $this->r(All::class))
-            ->addKeyboardKey('Посмотреть свои вишлисты', $this->r(Wishlist::class))
-            ->addKeyboardKey('Найти вишлист', $this->r(Search::class))
+            ->addKeyboardKey('Создать/отредактировать список желаний', $this->r(Wishlist::class))
+            ->addKeyboardKey('Найти вишлист другого человека', $this->r(Search::class))
         ;
 
         return $response;

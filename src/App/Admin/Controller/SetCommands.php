@@ -19,7 +19,8 @@ class SetCommands extends TelegramExtendedController
             ['commands' => [
                     new BotCommand(['command' => '/start', 'description' => 'В начало',]),
                     new BotCommand(['command' => $this->r(Wishlist::class), 'description' => Wishlist::$description,]),
-                    new BotCommand(['command' => $this->r(SetCommands::class), 'description' => 'Перезапустить бота',]),
+                    new BotCommand(['command' => $this->r(Restart::class), 'description' => 'Перезапустить бота',]),
+                    new BotCommand(['command' => $this->r(SetCommands::class), 'description' => 'Установит команды бота',]),
                 ]
             ]
         );

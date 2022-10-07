@@ -18,27 +18,7 @@ class Create extends TelegramExtendedController {
     public function text_message(): ?TelegramResponse
     {
         $userId = $this->getUserId();
-        $wishlistUserStorage = new WishlistUserStorage();
-        $wishlistStorage = new WishlistStorage();
-        $userListsData = $wishlistUserStorage->read()->get($userId, __METHOD__);
-        $listId = $userListsData[WishlistUserStorage::WISHLIST_ID] ?? null;
 
-        if ($listId) {
-            $listData = $wishlistStorage->read()->get($listId, __METHOD__);
-            if ($listData && isset($listData[WishlistStorage::NAME]) && $listData[WishlistStorage::NAME] !== '') {
-                $text = 'Твой вишлист: '.$listData[WishlistStorage::NAME];
-                return $this->textResponse($text)
-                    ->addKeyboardKey('Переименовать', '/wishlist_name',
-                        [
-                            'lid' => $listId,
-                        ])
-                    ;
-            }
-        }
-
-        $listId = $listId ?? Uuid::v4();
-        $result = $wishlistUserStorage->write()->update($userId, [WishlistUserStorage::WISHLIST_ID => $listId],  __METHOD__);
-        $listData = $wishlistStorage->write()->insert($listId,[], __METHOD__);
 
         $text = "Почти готов!\nНапиши название для своего вишлиста:";
         $this->setNextResourceByClass(Name::class, ['lid' => $listId, ]);

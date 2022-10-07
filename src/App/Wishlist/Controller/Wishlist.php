@@ -4,6 +4,7 @@ namespace App\Wishlist\Controller;
 
 use App\Item\Controller\All;
 use App\Item\Controller\Draft;
+use App\Wishlist\Service\WishlistService;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
 use Verse\Telegram\Run\Controller\TelegramExtendedController;
@@ -17,28 +18,16 @@ class Wishlist extends TelegramExtendedController {
     {
         $userId = $this->getUserId();
 
-        $storage = new WishlistUserStorage();
+        $service = new WishlistService();
+        $list = $service->createOrLoadUserWishlist($userId);
+        $listId = $list[WishlistStorage::ID];
 
-        $listData = $storage->read()->get($userId, __METHOD__);
-        $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
-
-        if (!$listId) {
-            return $this->textResponse('У тебя еще не создан вишлист!')
-                ->addKeyboardKey('Создать', $this->r(Create::class))
-            ;
-        }
-
-        $list = (new WishlistStorage())->read()->get($listId, __METHOD__);
         if ($list) {
-            $text = "У тебя есть вишлист и он называется\n \"" . $list[WishlistStorage::NAME].'"';
-            $buttonText = 'Переименовать';
-        } else {
-            $text = "У тебя есть вишлист, он без названия =( (" . $listId.')';
-            $buttonText = 'Задать имя';
+            $text = "Вишлист \"" . $list[WishlistStorage::NAME].'"';
         }
 
         return $this->textResponse($text)
-            ->addKeyboardKey($buttonText, $this->r(Name::class), [ 'lid' => $listId, ])
+//            ->addKeyboardKey($buttonText, $this->r(Name::class), [ 'lid' => $listId, ])
             ->addKeyboardKey("Добавить желание", $this->r(Draft::class), [ 'lid' => $listId, ])
             ->addKeyboardKey("Посмотреть желания", $this->r(All::class), [ 'lid' => $listId, ])
             ->addKeyboardKey("Поделиться, Управлять ссылками.", $this->r(\App\Link\Controller\All::class), [ 'lid' => $listId, ])

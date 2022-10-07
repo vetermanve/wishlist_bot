@@ -10,7 +10,7 @@
 #     PHP_XDEBUG_PORT      Порт для xdebug. Default "9000"
 #
 
-FROM php:7.4-cli-alpine
+FROM php:8.1-cli-alpine
 
 #
 #--------------------------------------------------------------------------
@@ -27,10 +27,10 @@ RUN apk --no-cache --update add       \
                     curl-dev          \
                     libzip-dev        \
                     icu-dev           \
-                    postgresql-dev    \
+#                    postgresql-dev    \
                     autoconf          \
-                    rabbitmq-c-dev    \
-                    libmemcached-dev  \
+#                    rabbitmq-c-dev    \
+#                    libmemcached-dev  \
                     runit             \
         && rm -rf /tmp/*              \
         && rm -rf /var/cache/apk/*
@@ -52,15 +52,16 @@ RUN docker-php-ext-install -j6 \
     bcmath        \
     opcache       \
     pcntl         \
-    pgsql         \
-    pdo_pgsql     \
+#    pgsql         \
+#    pdo_pgsql     \
     sockets
 
 
-RUN pecl install -o -f amqp             && \
-        docker-php-ext-enable amqp      && \
-    pecl install -o -f memcached        && \
-        docker-php-ext-enable memcached && \
+RUN \
+#    pecl install -o -f amqp             && \
+#        docker-php-ext-enable amqp      && \
+#    pecl install -o -f memcached        && \
+#        docker-php-ext-enable memcached && \
     pecl install -o -f redis            && \
         docker-php-ext-enable redis     && \
 #   Cleaning up
@@ -112,10 +113,12 @@ ENV PATH /var/www:$PATH
 
 WORKDIR /var/www
 
-ADD . /var/www
+COPY entrypoint /var/www/entrypoint
+COPY services /var/www/services
+COPY src /var/www/src
+COPY vendor /var/www/vendor
+COPY bootstrap.php README.md composer.json composer.lock /var/www/
 
-RUN composer install -a --no-progress
-
-RUN rm -f /var/www/.env.local
+#RUN composer install -a --no-progress
 
 CMD ["runsvdir", "-P", "/var/www/services/active"]

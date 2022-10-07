@@ -35,8 +35,8 @@ class TelegramTerminalProvider extends RequestProviderProto
     {
         $this->_prepareUserId();
 
-//        $this->processLine('/start');
-        $this->processLine('/wishlist_wishlist?_ta=n"');
+        $this->processLine('/start');
+//        $this->processLine('/wishlist_wishlist?_ta=n"');
 
         while (true) {
             $line = \readline('>>> ');

@@ -45,7 +45,7 @@ class Start extends TelegramExtendedController
 
         $response = $this->textResponse($text);
         $response
-            ->addKeyboardKey('Добавить желание', $this->r(Draft::class))
+//            ->addKeyboardKey('Добавить желание', $this->r(Draft::class))
             ->addKeyboardKey('Посмотреть все желания', $this->r(All::class))
             ->addKeyboardKey('Посмотреть свои вишлисты', $this->r(Wishlist::class))
             ->addKeyboardKey('Найти вишлист', $this->r(Search::class))

@@ -11,6 +11,8 @@ use Verse\Telegram\Run\Controller\TelegramResponse;
 
 class Wishlist extends TelegramExtendedController {
 
+    public static string $description = 'Все вишлисты';
+
     public function text_message(): ?TelegramResponse
     {
         $userId = $this->getUserId();

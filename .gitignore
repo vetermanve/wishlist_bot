@@ -6,6 +6,6 @@
 /tests/logs/
 /services/active/*/supervise
 composer.lock
-.env.local
+.env.loc*
 .phpunit.result.cache
 *.bkp

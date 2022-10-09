@@ -59,7 +59,7 @@ class Edit extends WishlistBaseController
                         $text = "Текущая цена \"{$item[ItemStorage::PRICE]}\"\nВведи новую:";
                         break;
                     case ItemStorage::LINK:
-                        $text = "Текущая ссылка \"{$item[ItemStorage::LINK]}\"\nВведи новую:";
+                        $text = "Текущая ссылка: {$item[ItemStorage::LINK]}\nВведи новую:";
                         break;
                 }
 

@@ -1,16 +1,23 @@
 version: '2'
 
 services:
-
-  workers:
-    build:
-      context: .docker/php-worker
-      args:
-        PUID: "1000"
-        PHP_INSTALL_XDEBUG: "true"
-        INSTALL_GIT: "true"
-        PHP_XDEBUG_PORT: "9000"
+  wl :
+    image: "vetermanve/wishlist"
+    restart: unless-stopped
     volumes:
-      - ./:/var/www
-    environment:
-      - "PHP_IDE_CONFIG=serverName=localhost"
+      - .env.local:/var/www/.env
+      - ./data:/var/www/data
+      - ./logs:/var/www/logs
+
+#  workers:
+#    build:
+#      context: .docker/php-worker
+#      args:
+#        PUID: "1000"
+#        PHP_INSTALL_XDEBUG: "true"
+#        INSTALL_GIT: "true"
+#        PHP_XDEBUG_PORT: "9000"
+#    volumes:
+#      - ./:/var/www
+#    environment:
+#      - "PHP_IDE_CONFIG=serverName=localhost"

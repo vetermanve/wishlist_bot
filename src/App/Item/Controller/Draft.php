@@ -45,12 +45,10 @@ class Draft extends WishlistBaseController
                 )
             );
             $page = file_get_contents($url, 0, $ctx);
-            preg_match('/<title>(.*?)<\/title>/s', $page, $match);
+            preg_match('/<title.*>(.*?)<\/title>/s', $page, $match);
             $title = strip_tags($match[1] ?? '');
             if ($title && mb_strlen($title) > 1) {
                 $text = $title;
-            } else {
-                $url = '';
             }
         } else {
             $url = '';
@@ -81,7 +79,7 @@ class Draft extends WishlistBaseController
             if (!$listId) {
 
                 $listData = $wlService->createOrLoadUserWishlist($this->getUserId());
-                $listId = $listData[WishlistUserStorage::WISHLIST_ID];
+                $listId = $listData[WishlistStorage::ID];
             }
         }
 
@@ -90,7 +88,6 @@ class Draft extends WishlistBaseController
         }
 
         $items = array_merge($listData[WishlistStorage::ITEMS] ?? [], [$id]);
-
 
         $wlService->updateWishlist($listId, [
             WishlistStorage::ITEMS => $items

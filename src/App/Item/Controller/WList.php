@@ -29,16 +29,11 @@ class WList extends WishlistBaseController
 
         $storage = new ItemStorage();
 
-
         $items = $storage->read()->mGet($itemsIds, __METHOD__);
 
         $text = $list[WishlistStorage::NAME]."\n";
 
-        foreach ($items as $item) {
-            $text.= "\n - ".$item[ItemStorage::NAME];
-        }
-
-//        $this->setState('edit_mode', false);
+        $text .= $this->_render('all',['items' => $items]);
 
         return $this->textResponse($text)
 //            ->addKeyboardKey('Добавить желание', $this->r(Draft::class), [])

@@ -51,4 +51,5 @@ class WishlistBaseController extends TelegramRunController
     protected function getResourceByClass($className) {
         return ResourceCompiler::fromClassName($className);
     }
+    
 }

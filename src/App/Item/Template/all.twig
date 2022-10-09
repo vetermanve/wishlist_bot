@@ -1,0 +1,11 @@
+Желания:
+
+{% block content %}
+    {% for item in items %}
+        {% if item.lnk %}
+            <a href="{{ item.lnk }}">{{ item.name }}</a>
+        {% else %}
+            {{ item.name }}
+        {% endif %}
+    {% endfor %}
+{% endblock %}

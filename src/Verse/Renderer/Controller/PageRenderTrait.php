@@ -45,13 +45,14 @@ trait PageRenderTrait
     protected function _render($template, $data = [])
     {
         $data += $this->_getRenderDefaultData();
-        $renderer = $this->getRenderer();
 
-        return $this->getRenderer()->render($template, $data,
+        $page = $this->getRenderer()->render($template, $data,
             $this->getLayout(),
             [
                 $this->getRendererTemplatesPath()
             ]
         );
+
+        return preg_replace('/\n\s+/', "\n", $page);
     }
 }

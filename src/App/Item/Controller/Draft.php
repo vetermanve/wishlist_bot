@@ -32,12 +32,37 @@ class Draft extends WishlistBaseController
             return $this->textResponse("Хорошо, закончили");
         }
 
+        //
+
+        // Remove all illegal characters from a url
+        $url = filter_var($text, FILTER_SANITIZE_URL);
+
+        if (filter_var($url, FILTER_VALIDATE_URL) !== false) {
+            $ctx = stream_context_create(array(
+                    'http' => array(
+                        'timeout' => 1
+                    )
+                )
+            );
+            $page = file_get_contents($url, 0, $ctx);
+            preg_match('/<title>(.*?)<\/title>/s', $page, $match);
+            $title = strip_tags($match[1] ?? '');
+            if ($title && mb_strlen($title) > 1) {
+                $text = $title;
+            } else {
+                $url = '';
+            }
+        } else {
+            $url = '';
+        }
+
         // записываем желание
         $storage = new ItemStorage();
         $id = Uuid::v4();
 
         $writeResult = $storage->write()->insert($id, [
-            ItemStorage::NAME => $this->p('text'),
+            ItemStorage::NAME => $text,
+            ItemStorage::LINK => $url,
             ItemStorage::USER_ID => $this->getUserId(),
             ItemStorage::CREATED_AT => time(),
         ], __METHOD__);
@@ -76,7 +101,7 @@ class Draft extends WishlistBaseController
         $text .= "Что еще хочешь?";
 
         return $this->textResponse($text)
-            ->addKeyboardKey('Отменить', $this->r(Delete::class), ['iid' => $id],MessageRoute::APPEAR_CALLBACK_ANSWER)
+            ->addKeyboardKey('Отменить', $this->r(Delete::class), ['iid' => $id], MessageRoute::APPEAR_CALLBACK_ANSWER)
             ->addKeyboardKey('Показать все желания', $this->r(All::class), ['iid' => $id])
             ->addKeyboardKey('Давай закончим.', $this->r(Done::class), [], MessageRoute::APPEAR_CALLBACK_ANSWER);
     }

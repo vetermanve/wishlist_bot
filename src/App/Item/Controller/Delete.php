@@ -36,7 +36,7 @@ class Delete extends WishlistBaseController
 
             $listData = $wishlistStorage->read()->get($listId, __METHOD__);
 
-            if ($listData) {
+            if ($listData && isset($listData[WishlistStorage::ITEMS])) {
                 $items = $listData[WishlistStorage::ITEMS];
                 $key = array_search($id, $items);
 

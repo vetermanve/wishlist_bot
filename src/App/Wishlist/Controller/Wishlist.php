@@ -7,10 +7,11 @@ use App\Item\Controller\Draft;
 use App\Wishlist\Service\WishlistService;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Wishlist extends TelegramExtendedController {
+class Wishlist extends WishlistBaseController
+{
 
     public static string $description = 'Все вишлисты';
 
@@ -23,15 +24,14 @@ class Wishlist extends TelegramExtendedController {
         $listId = $list[WishlistStorage::ID];
 
         if ($list) {
-            $text = "Вишлист \"" . $list[WishlistStorage::NAME].'"';
+            $text = "Вишлист \"" . $list[WishlistStorage::NAME] . '"';
         }
 
         return $this->textResponse($text)
-//            ->addKeyboardKey($buttonText, $this->r(Name::class), [ 'lid' => $listId, ])
-            ->addKeyboardKey("Добавить желание", $this->r(Draft::class), [ 'lid' => $listId, ])
-            ->addKeyboardKey("Посмотреть желания", $this->r(All::class), [ 'lid' => $listId, ])
-            ->addKeyboardKey("Поделиться, Управлять ссылками.", $this->r(\App\Link\Controller\All::class), [ 'lid' => $listId, ])
-        ;
+            ->addKeyboardKey("Добавить желание", $this->r(Draft::class), ['lid' => $listId,])
+            ->addKeyboardKey("Посмотреть желания", $this->r(All::class), ['lid' => $listId,])
+            ->addKeyboardKey("Переименовать", $this->r(Name::class), ['lid' => $listId,])
+            ->addKeyboardKey("Поделиться, Управлять ссылками.", $this->r(\App\Link\Controller\All::class), ['lid' => $listId,]);
     }
 
     public function callback_query(): ?TelegramResponse

@@ -9,10 +9,11 @@ use App\Link\Service\LinkStorage;
 use App\Wishlist\Controller\Search;
 use App\Wishlist\Controller\Wishlist;
 use App\Wishlist\Service\WishlistStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use Verse\Telegram\Run\Channel\Util\MessageRoute;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Start extends TelegramExtendedController
+class Start extends WishlistBaseController
 {
 
     public function text_message(): ?TelegramResponse
@@ -45,7 +46,7 @@ class Start extends TelegramExtendedController
         $response = $this->textResponse($text);
         $response
 //            ->addKeyboardKey('Добавить желание', $this->r(Draft::class))
-            ->addKeyboardKey('Создать/отредактировать список желаний', $this->r(Wishlist::class))
+            ->addKeyboardKey('Создать/отредактировать список желаний', $this->r(Wishlist::class), [],MessageRoute::APPEAR_NEW_MESSAGE)
             ->addKeyboardKey('Найти вишлист другого человека', $this->r(Search::class))
         ;
 

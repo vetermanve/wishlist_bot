@@ -9,7 +9,7 @@ use Verse\Run\RunCore;
 use Verse\Run\RuntimeLog;
 
 // start build schema
-$schema = new TelegramPullExtendedScheme();
+$schema = new \Base\Schema\WishlistSchema();
 
 $context = new RunContext();
 $role = 'TelegramProvider';

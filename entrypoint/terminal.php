@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/../bootstrap.php';
 
+use Base\Schema\WishlistSchema;
 use Monolog\Handler\RotatingFileHandler;
 use Verse\Run\RunContext;
 use Verse\Run\RunCore;
@@ -19,7 +20,7 @@ foreach (array_slice($argv, 1) as $index => $item) {
 }
 
 // start build schema
-$schema = new TerminalTelegramSchema();
+$schema = new WishlistSchema();
 
 $context = new RunContext();
 $role = 'Terminal';

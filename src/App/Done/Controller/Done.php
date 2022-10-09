@@ -4,10 +4,10 @@
 namespace App\Done\Controller;
 
 
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Done extends TelegramExtendedController
+class Done extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

@@ -65,6 +65,12 @@ class WishlistService
         return $listData;
     }
 
+    public function updateWishlist($listId, $updateBind)
+    {
+        $wishlistStorage = new WishlistStorage();
+        return $wishlistStorage->write()->update($listId, $updateBind, __METHOD__);
+    }
+
     /**
      * @return string
      */

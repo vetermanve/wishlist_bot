@@ -3,13 +3,13 @@
 namespace App\Wishlist\Controller;
 
 use App\Wishlist\Service\WishlistUserStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Run\Spec\DisplayControl;
 
-class Remove extends TelegramExtendedController {
+class Remove extends WishlistBaseController {
 
     public function text_message(): ?TelegramResponse
     {

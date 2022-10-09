@@ -7,10 +7,10 @@ namespace App\Item\Controller;
 use App\Item\Service\ItemStorage;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Delete extends TelegramExtendedController
+class Delete extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

@@ -6,11 +6,11 @@ namespace App\Admin\Controller;
 
 use App\Wishlist\Controller\Wishlist;
 use Telegram\Bot\Objects\BotCommand;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Service\VerseTelegramClient;
 
-class SetCommands extends TelegramExtendedController
+class SetCommands extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

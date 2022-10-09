@@ -6,12 +6,12 @@ namespace App\Item\Controller;
 
 use App\Item\Service\ItemStorage;
 use App\Wishlist\Service\WishlistStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Storage\Spec\Compare;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class WList extends TelegramExtendedController
+class WList extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

@@ -5,10 +5,10 @@ namespace App\Wishlist\Controller;
 use App\Item\Controller\Draft;
 use App\Wishlist\Service\WishlistStorage;
 use Exception;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Name extends TelegramExtendedController {
+class Name extends WishlistBaseController {
 
     /**
      * @return TelegramResponse|null

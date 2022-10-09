@@ -2,10 +2,10 @@
 
 namespace App\Wishlist\Controller;
 
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Search extends TelegramExtendedController {
+class Search extends WishlistBaseController {
 
     public function text_message(): ?TelegramResponse
     {

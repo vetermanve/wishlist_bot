@@ -6,10 +6,10 @@ namespace App\Landing\Controller;
 
 use App\Item\Controller\All;
 use App\Wishlist\Controller\Wishlist;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Landing extends TelegramExtendedController
+class Landing extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

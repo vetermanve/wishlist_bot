@@ -5,11 +5,11 @@ namespace App\Admin\Controller;
 
 
 use Telegram\Bot\Objects\BotCommand;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Service\VerseTelegramClient;
 
-class Restart extends TelegramExtendedController
+class Restart extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

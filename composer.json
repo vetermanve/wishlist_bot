@@ -21,7 +21,7 @@
         "verse/run": "^1.1",
         "verse/storage": "^1.0",
         "verse/modular": "^1.0",
-        "verse/telegram" : "dev-main",
+        "verse/telegram" :  "^1.0",
         "ext-json": "*",
         "vlucas/phpdotenv": "^5.3",
         "vetermanve/background_multiprocessor": "^0.9",
@@ -29,7 +29,8 @@
         "phpunit/phpunit": "^9.5",
         "spatie/emoji": "^3.0",
         "ext-mbstring": "*",
-        "symfony/console": "^5.4"
+        "symfony/console": "^5.4",
+        "twig/twig": "^2.5"
     },
     "minimum-stability" : "stable"
 }

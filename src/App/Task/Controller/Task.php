@@ -9,10 +9,10 @@ use Verse\Notify\Service\NotifyGate;
 use Verse\Notify\Spec\ChannelType;
 use Verse\Notify\Spec\GateChannel;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Task extends TelegramExtendedController
+class Task extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

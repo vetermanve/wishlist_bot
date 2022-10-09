@@ -6,14 +6,15 @@ namespace App\Item\Controller;
 
 use App\Done\Controller\Done;
 use App\Item\Service\ItemStorage;
+use App\Wishlist\Service\WishlistService;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Draft extends TelegramExtendedController
+class Draft extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {
@@ -31,27 +32,7 @@ class Draft extends TelegramExtendedController
             return $this->textResponse("Хорошо, закончили");
         }
 
-        $listId = $this->p('lid');
-        if (!$listId) {
-            $listId = $this->getState('lid');
-            if (!$listId) {
-                $userWishlistStorage = new WishlistUserStorage();
-                $userListData = $userWishlistStorage->read()->get($this->getUserId(), __METHOD__);
-                if (!$userListData) {
-                    return $this->textResponse('Я не нашел вишлиста куда добавить. Нужно бы его создать.')
-                        ->addKeyboardKey('Создать вишлист', '/wishlist_create');
-                }
-
-                $listId = $userListData[WishlistUserStorage::WISHLIST_ID];
-            }
-        }
-
-        $listData = [];
-        if ($listId) {
-            $listStorage = new WishlistStorage();
-            $listData = $listStorage->read()->get($listId, __METHOD__);
-        }
-
+        // записываем желание
         $storage = new ItemStorage();
         $id = Uuid::v4();
 
@@ -62,30 +43,36 @@ class Draft extends TelegramExtendedController
         ], __METHOD__);
 
         if (!$writeResult) {
-            return $this->textResponse('Не удалось записать.');
+            return $this->textResponse('Не удалось записать желание.');
         }
 
-        $wishlistStorage = new WishlistStorage();
-        $userListData = $wishlistStorage->read()->get($listId, __METHOD__);
+        // ищем текущий список
+        $wlService = new WishlistService();
+        $listData = [];
+
+        $listId = $this->p('lid');
+        if (!$listId) {
+            $listId = $this->getState('lid');
+            if (!$listId) {
+
+                $listData = $wlService->createOrLoadUserWishlist($this->getUserId());
+                $listId = $listData[WishlistUserStorage::WISHLIST_ID];
+            }
+        }
+
+        if (!$listData) {
+            $listData = $wlService->getWishlistData($listId);
+        }
+
         $items = array_merge($listData[WishlistStorage::ITEMS] ?? [], [$id]);
 
-        $wishlistStorage->write()->update($listId, [
+
+        $wlService->updateWishlist($listId, [
             WishlistStorage::ITEMS => $items
-        ], __METHOD__);
+        ]);
 
         $text = "Я записал, что ты хочешь: $text\n";
-        if (!empty($listData)) {
-            if (!isset($listData[WishlistStorage::ITEMS]) || !is_array($listData[WishlistStorage::ITEMS])) {
-                $listData[WishlistStorage::ITEMS] = [];
-            }
-
-            $listData[WishlistStorage::ITEMS][] = $id;
-
-            $text .= "В список \"{$userListData[WishlistStorage::NAME]}\"\n";
-        } else {
-            $text .= "просто в список твоих желаний, потому что не нашел твоего вишлиста.\n";
-        }
-
+        $text .= "В список \"{$listData[WishlistStorage::NAME]}\"\n";
         $text .= "Что еще хочешь?";
 
         return $this->textResponse($text)

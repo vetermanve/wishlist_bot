@@ -6,14 +6,14 @@ use App\Done\Controller\Done;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
 use Psr\Log\LoggerInterface;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Di\Env;
 use Verse\Run\RunContext;
 use Verse\Run\Util\Uuid;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 use Verse\Telegram\Run\Controller\TelegramRunController;
 
-class Create extends TelegramExtendedController {
+class Create extends WishlistBaseController {
 
     public function text_message(): ?TelegramResponse
     {

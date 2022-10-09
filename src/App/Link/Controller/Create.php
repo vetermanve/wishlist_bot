@@ -6,10 +6,10 @@ namespace App\Link\Controller;
 
 use App\Link\Service\Links;
 use App\Link\Service\LinkStorage;
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Create extends TelegramExtendedController
+class Create extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {

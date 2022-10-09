@@ -4,14 +4,14 @@
 namespace App\Iam\Controller;
 
 
-use Verse\Telegram\Run\Controller\TelegramExtendedController;
+use App\Base\Controller\WishlistBaseController;
 use Verse\Telegram\Run\Controller\TelegramResponse;
 
-class Iam extends TelegramExtendedController
+class Iam extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {
-        return $this->textResponse('Твой ID '.$this->getUserId());
+        return $this->textResponse($this->_render('iam',['id' => $this->getUserId(), ]));
     }
 
     public function callback_query(): ?TelegramResponse

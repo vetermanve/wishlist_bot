@@ -75,7 +75,7 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             return $textControllerClass ?? $baseControllerClass;
         }
 
-        $stateResource = $request->getChannelState()->get(TelegramRequestRouterState::RESOURCE);
+        $stateResource = $request->getChannelState()->get(TelegramRequestRouterState::NEXT_RESOURCE);
 
         if ($stateResource) {
             if ($request->getParamOrData('text') === '') {
@@ -83,7 +83,7 @@ class StateBasedRequestRouter extends TelegramRouterByMessageType
             }
 
             $request->setResource($stateResource);
-            $data = $request->getChannelState()->get(TelegramRequestRouterState::DATA);
+            $data = $request->getChannelState()->get(TelegramRequestRouterState::NEXT_RESOURCE_DATA);
             if (is_array($data)) {
                 $request->data = $data + $request->data;
             }

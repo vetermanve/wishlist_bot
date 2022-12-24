@@ -13,6 +13,12 @@ class ResourceCompiler
             "\\" => ''
         ]);
 
-        return $prefix.strtolower(preg_replace(['/([a-z\d])([A-Z])/', '/([^_])([A-Z][a-z])/'], '$1_$2', $className));
+        $text = strtolower(preg_replace(['/([a-z\d])([A-Z])/', '/([^_])([A-Z][a-z])/'], '$1_$2', $className));
+        $parts = explode('_', $text);
+        if ($parts[0] === $parts[1]) {
+            return $prefix.$parts[0];
+        }
+
+        return $prefix.$text;
     }
 }

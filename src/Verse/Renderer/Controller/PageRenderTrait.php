@@ -53,6 +53,6 @@ trait PageRenderTrait
             ]
         );
 
-        return preg_replace('/\n\s+/', "\n", $page);
+        return trim(preg_replace('/\n\s+/', "\n", $page));
     }
 }

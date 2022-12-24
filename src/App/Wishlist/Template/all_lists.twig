@@ -1,0 +1,14 @@
+Списки:
+
+{% block content %}
+    {% for _list in lists %}
+        {{ loop.index }}. {{ _list.n }} | {{ _list.items | length }} желаний
+        {% set count = _list.items | length %}
+        {% trans %}
+            1 желание
+        {% plural count %}
+            {{ count }} желания
+        {% endtrans %}
+        {% endset %}
+    {% endfor %}
+{% endblock %}

@@ -13,7 +13,10 @@ use Verse\Storage\StorageDependency;
 class WishlistUserStorage extends SimpleStorage
 {
     const USER_ID = 'id';
-    const WISHLIST_ID = 'wl_id';
+    const DEFAULT_WISHLIST_ID = 'wl_id';
+    const ALL_WISHLIST_IDS = 'wl_ids_all';
+    const PUBLIC_WISHLIST_IDS = 'wl_ids_pub';
+    const ARCHIVED_WISHLIST_IDS = 'wl_ids_arch';
 
     public function loadConfig()
     {

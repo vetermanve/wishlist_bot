@@ -1,11 +1,11 @@
-Желания:
+{{ list.n }}:
 
 {% block content %}
     {% for item in items %}
         {% if item.lnk %}
-            {{ loop.index }}. <a href="{{ item.lnk }}">{{ item.name }}</a>
+            /{{ loop.index }}. <a href="{{ item.lnk }}">{{ item.name }}</a>
         {% else %}
-            {{ loop.index }}. {{ item.name }}
+            /{{ loop.index }}. {{ item.name }}
         {% endif %}
     {% endfor %}
 {% endblock %}

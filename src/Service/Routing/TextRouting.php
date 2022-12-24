@@ -5,7 +5,7 @@ namespace Service\Routing;
 
 
 use App\Done\Controller\Done;
-use App\Item\Controller\All;
+use App\Item\Controller\AllItems;
 use App\Item\Controller\Draft;
 use App\Item\Controller\EditMode;
 use App\Wishlist\Controller\Name;
@@ -36,14 +36,14 @@ class TextRouting implements TextRouterInterface
         }
 
         if ($text === 'покажи') {
-            $resource = ResourceCompiler::fromClassName(All::class);
+            $resource = ResourceCompiler::fromClassName(AllItems::class);
         }
 
         if ($text === 'list') {
             if ($request->getChannelState()->get('edit_mode') === 1) {
                 $resource = ResourceCompiler::fromClassName(EditMode::class);
             } else {
-                $resource = ResourceCompiler::fromClassName(All::class);
+                $resource = ResourceCompiler::fromClassName(AllItems::class);
             }
         }
 

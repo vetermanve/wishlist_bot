@@ -6,6 +6,7 @@ namespace App\Item\Controller;
 
 use App\Done\Controller\Done;
 use App\Item\Service\ItemStorage;
+use App\Wishlist\Controller\Wishlist;
 use App\Wishlist\Service\WishlistService;
 use App\Wishlist\Service\WishlistStorage;
 use App\Wishlist\Service\WishlistUserStorage;
@@ -18,13 +19,14 @@ class Draft extends WishlistBaseController
 {
     public function text_message(): ?TelegramResponse
     {
-        $this->setNextResource('/item_draft');
+        // Делаем так, чтобы следующий текстовый ввод влетал в этот же контроллер
+        $this->setNextResource($this->r(self::class));
 
         $text = $this->p('text');
 
         if (!$text) {
-            return $this->textResponse('Что ты хочешь? Напиши!')
-                ->addKeyboardKey('Пока не хочу', '/done', [], MessageRoute::APPEAR_CALLBACK_ANSWER);
+            return $this->textResponse('Назови своё желание:')
+                ->addKeyboardKey('Назад', $this->getBrowseBackResource(), [], MessageRoute::APPEAR_CALLBACK_ANSWER);
         }
 
         if (mb_eregi('ничего|закончил|хватит', $text) !== false) {
@@ -93,14 +95,13 @@ class Draft extends WishlistBaseController
             WishlistStorage::ITEMS => $items
         ]);
 
-        $text = "Я записал, что ты хочешь: $text\n";
-        $text .= "В список \"{$listData[WishlistStorage::NAME]}\"\n";
+        $text = "\"$text\" - Добавлено в \"{$listData[WishlistStorage::NAME]}\"\n";
         $text .= "Что еще хочешь?";
 
         return $this->textResponse($text)
-            ->addKeyboardKey('Отменить', $this->r(Delete::class), ['iid' => $id], MessageRoute::APPEAR_CALLBACK_ANSWER)
-            ->addKeyboardKey('Показать все желания', $this->r(All::class), ['iid' => $id])
-            ->addKeyboardKey('Давай закончим.', $this->r(Done::class), [], MessageRoute::APPEAR_CALLBACK_ANSWER);
+            ->addKeyboardKey('Покажи все желания', $this->r(Wishlist::class), ['lid' => $listId])
+            ->addKeyboardKey('Пока ничего', $this->r(Done::class), [], MessageRoute::APPEAR_CALLBACK_ANSWER)
+            ->addKeyboardKey('Отмени добавление', $this->r(Delete::class), ['iid' => $id], MessageRoute::APPEAR_CALLBACK_ANSWER);
     }
 
 }

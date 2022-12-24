@@ -65,7 +65,7 @@ class TelegramTerminalOutput extends SolidStateTelegramResponseChannel
             $route = new MessageRoute($msg->getDestination());
             $data = (array)$msg->getChannelState()->pack(true);
             $data[self::LAST_BUTTON_COMMANDS] = $buttonCommands;
-            $this->runtime->debug('Wite meta', ['id' => $route->getChatId(), 'dest' => $msg->getDestination(), ]);
+            //$this->runtime->debug('Write state storage', ['id' => $route->getChatId(), 'dest' => $msg->getDestination(), ]);
             $this->stateStorage->write()->update($route->getChatId(), $data, __METHOD__);
         }
     }

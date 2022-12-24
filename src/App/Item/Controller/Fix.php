@@ -17,7 +17,7 @@ class Fix extends WishlistBaseController
     {
         $userWishlistStorage = new WishlistUserStorage();
         $usersLists = $userWishlistStorage->search()->find([], 1000, __METHOD__);
-        $listsIdsByUsers = array_column($usersLists, WishlistUserStorage::WISHLIST_ID, WishlistUserStorage::USER_ID);
+        $listsIdsByUsers = array_column($usersLists, WishlistUserStorage::DEFAULT_WISHLIST_ID, WishlistUserStorage::USER_ID);
         $users = array_keys($usersLists);
 
         $itemsStorage = new ItemStorage();

@@ -48,7 +48,7 @@ class EditMode extends WishlistBaseController
         $this->setState('edit_mode', 1);
 
         return $this->textResponse($text)
-            ->addKeyboardKey('Закончить редактирование', $this->getResourceByClass(All::class), [], MessageRoute::APPEAR_EDIT_MESSAGE)
+            ->addKeyboardKey('Закончить редактирование', $this->getResourceByClass(AllItems::class), [], MessageRoute::APPEAR_EDIT_MESSAGE)
             ->addKeyboardKey('Обновить', $this->getResourceByClass(EditMode::class), [], MessageRoute::APPEAR_EDIT_MESSAGE)
             ;
     }

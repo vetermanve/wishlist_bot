@@ -5,7 +5,7 @@ namespace Run\Scheme;
 
 
 use App\Done\Controller\Done;
-use App\Item\Controller\All;
+use App\Item\Controller\AllItems;
 use App\Item\Controller\EditMode;
 use App\Landing\Controller\Landing;
 use PHPUnit\Framework\TestCase;

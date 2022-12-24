@@ -11,7 +11,6 @@ use Verse\Run\RunRequest;
 use Verse\Run\Spec\HttpRequestMetaSpec;
 use Verse\Run\Util\ChannelState;
 use Verse\Run\Util\Uuid;
-use Verse\Scheduler\Storage\EventsStorage;
 use Verse\Storage\StorageProto;
 use Verse\Telegram\Run\Channel\Util\MessageRoute;
 use Verse\Telegram\Run\Spec\MessageType;
@@ -22,9 +21,9 @@ class TelegramTerminalProvider extends RequestProviderProto
     protected ?int $userId = null;
 
     /**
-     * @var StorageProto
+     * @var ?StorageProto
      */
-    private $stateStorage;
+    private ?StorageProto $stateStorage;
 
     public function prepare()
     {
@@ -36,7 +35,7 @@ class TelegramTerminalProvider extends RequestProviderProto
         $this->_prepareUserId();
 
         $this->processLine('/start');
-//        $this->processLine('/wishlist_wishlist?_ta=n"');
+//        $this->processLine('/start  12312313');
 
         while (true) {
             $line = \readline('>>> ');
@@ -44,14 +43,13 @@ class TelegramTerminalProvider extends RequestProviderProto
         }
     }
 
-    protected function processLine($message) : void {
+    protected function processLine($message): void
+    {
         $route = new MessageRoute();
         $route->setChatId($this->userId);
 
-        $providerCommand = $this->_detectProviderCommand($message);
-        if ($providerCommand) {
-            $this->execProviderCommand($providerCommand);
-            return ;
+        if ($this->execProviderCommand($message)) {
+            return;
         }
 
         $command = $this->_detectButtonCall($message, $route);
@@ -72,28 +70,25 @@ class TelegramTerminalProvider extends RequestProviderProto
                 parse_str($paramsSting, $params);
             }
 
-            $message = mb_substr($message, mb_strlen($command));
+            $message = trim(mb_substr($message, mb_strlen($command)));
         }
 
-        $this->runtime->debug('Got command', ['_c' => $command, '_t' => $method, ]);
+        $this->runtime->debug('Got command', ['_c' => $command, '_t' => $method,]);
 
         $req = new RunRequest(Uuid::v4(), $resource, $route->packString());
         $req->data = ['text' => $message];
         $req->params = [
-            'from' => ['id' => $this->userId],
-        ] + $params;
+                'from' => [
+                    'id' => $this->userId,
+                    'first_name' => 'U'.$this->userId,
+                ],
+            ] + $params;
         $req->meta[HttpRequestMetaSpec::REQUEST_METHOD] = $method;
 
         $this->core->process($req);
     }
 
-    protected function _detectProviderCommand(string $message) {
-        if (substr($message, 0 , 3 ) === '!!!') {
-            return substr($message, 3);
-        }
-    }
-
-    protected function _detectButtonCall($message, MessageRoute $route) : ?string
+    protected function _detectButtonCall($message, MessageRoute $route): ?string
     {
         if (!isset($this->stateStorage)) {
             return null;
@@ -102,16 +97,16 @@ class TelegramTerminalProvider extends RequestProviderProto
         $buttonId = intval($message);
 
         if ((string)$buttonId !== $message) {
-            $this->runtime->debug('NO button detected');
+            //$this->runtime->debug('NO button detected');
             return null;
         }
 
         $data = $this->stateStorage->read()->get($route->getChatId(), __METHOD__, []);
-        $this->runtime->debug('button call' , ['id' => $buttonId, 'message' => $message, 'route' => $route->getChatId(), 'data' => $data,]);
+        $this->runtime->debug('button call', ['id' => $buttonId, 'message' => $message, 'route' => $route->getChatId(), 'data' => $data,]);
         return $data[TelegramTerminalOutput::LAST_BUTTON_COMMANDS][$buttonId] ?? null;
     }
 
-    protected function _detectCommand(string $message) : string
+    protected function _detectCommand(string $message): string
     {
         // cut message to detect command
         $message = substr(trim($message), 0, 256);
@@ -134,47 +129,52 @@ class TelegramTerminalProvider extends RequestProviderProto
     private function _prepareUserId()
     {
         if (!$this->userId) {
-            $this->userId =$this->context->getScope(RunContext::GLOBAL_CONFIG, 'USER_ID');
+            $this->userId = $this->context->getScope(RunContext::GLOBAL_CONFIG, 'USER_ID');
             if (!$this->userId) {
                 $this->userId = mt_rand(1, 1000);
             }
 
             $msg = new ChannelMsg();
-            $msg->body = 'UserId selected: '.$this->userId."\n".'To Change type !!!user_id=1';
+            $msg->body = 'UserId selected: ' . $this->userId . "\n" . 'To Change type !!!user_id=1';
             $msg->setChannelState(new ChannelState());
             $this->core->getDataChannel()->send($msg);
-
         }
     }
 
-    protected function execProviderCommand(string $providerCommand)
+    protected function execProviderCommand(string $command): bool
     {
-        [$command, $params] = explode(' ', $providerCommand, 2);
-        if ($params) {
-            $params = urldecode($params);
+        $param = '';
+        if (str_contains($command, ' ')) {
+            [$command, $param] = explode(' ', $command, 2);
         }
 
+        $acted = false;
+
         switch ($command) {
-            case 'user':
-                $this->userId = $params['id'];
-                $msg = new ChannelMsg();
-                $msg->body = 'UserId set: '.$this->userId."\n";
-                $msg->setChannelState(new ChannelState());
+            case 'r' :  // reload
+                exit(1);
+            case 'u': // set user id in context
+                $acted = true;
+                $this->userId = intval($param);
+                $this->runtime->debug('UserId is set', ['id' => $this->userId]);
+                break;
         }
+
+        return $acted;
     }
 
     /**
-     * @return mixed
+     * @return ?StorageProto
      */
-    public function getStateStorage()
+    public function getStateStorage(): ?StorageProto
     {
         return $this->stateStorage;
     }
 
     /**
-     * @param mixed $stateStorage
+     * @param StorageProto $stateStorage
      */
-    public function setStateStorage($stateStorage): void
+    public function setStateStorage(StorageProto $stateStorage): void
     {
         $this->stateStorage = $stateStorage;
     }

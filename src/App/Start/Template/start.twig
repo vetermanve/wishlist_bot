@@ -1,0 +1,22 @@
+{% block content %}
+    {% if  name %}
+        Привет {{ name }}!
+    {% else %}
+        Привет!
+    {% endif %}
+
+    {% if list and list.items | length > 0 %}
+        У тебя в списке {{ list.items | length }} желаний
+    {% endif %}
+
+    {% for _list in lists %}
+        {{ loop.index }}. {{ _list.n }} | {{ _list.items | length }} желаний
+{#        {% set count = _list.items | length %}#}
+{#        {% trans %}#}
+{#            1 желание#}
+{#        {% plural count %}#}
+{#            {{ count }} желания#}
+{#        {% endtrans %}#}
+{#        {% endset %}#}
+    {% endfor %}
+{% endblock %}

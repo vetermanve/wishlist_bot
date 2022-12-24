@@ -16,7 +16,7 @@ class Remove extends WishlistBaseController {
         $userId = $this->getUserId();
         $storage = new WishlistUserStorage();
         $listData = $storage->read()->get($userId, __METHOD__);
-        $listId = $listData[WishlistUserStorage::WISHLIST_ID] ?? null;
+        $listId = $listData[WishlistUserStorage::DEFAULT_WISHLIST_ID] ?? null;
 
         if ($listId) {
             $storage->write()->remove($userId, __METHOD__);

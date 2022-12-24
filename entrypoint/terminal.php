@@ -4,6 +4,7 @@ require_once __DIR__.'/../bootstrap.php';
 
 use Base\Schema\WishlistSchema;
 use Monolog\Handler\RotatingFileHandler;
+use Verse\Renderer\Component\RenderSetupComponent;
 use Verse\Run\RunContext;
 use Verse\Run\RunCore;
 use Verse\Run\RuntimeLog;
@@ -20,7 +21,8 @@ foreach (array_slice($argv, 1) as $index => $item) {
 }
 
 // start build schema
-$schema = new WishlistSchema();
+$schema = new TerminalTelegramSchema();
+$schema->addComponent(new RenderSetupComponent());
 
 $context = new RunContext();
 $role = 'Terminal';

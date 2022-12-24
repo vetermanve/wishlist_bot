@@ -14,6 +14,7 @@ class WishlistStorage extends SimpleStorage
 {
     const ID = "id";
     const NAME = "n";
+    const OWNER = "owner";
     const ITEMS = "items";
     const LINKS = "links";
     const EDITORS = "editors";
